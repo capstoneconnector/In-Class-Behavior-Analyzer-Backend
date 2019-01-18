@@ -45,6 +45,7 @@ def login(request):
         if not is_correct_password:
             return JsonResponse(get_error_object(5))
         auth.login(request, user)
+
     except KeyError:
         return JsonResponse(get_error_object(4))
 
@@ -65,13 +66,23 @@ def register(request):
         email = request.POST['email']
         u = User.objects.create(username=username, email=email)
         u.set_password(password)
+
+        if 'first_name' in request.POST:
+            u.first_name = request.POST['first_name']
+
+        if 'last_name' in request.POST:
+            u.last_name = request.POST['last_name']
+
         u.save()
         s = Student.objects.create(user=u)
         s.save()
+
     except KeyError:
         return JsonResponse(get_error_object(4))
+
     except ValidationError:
         return JsonResponse(get_error_object(6))
+
     except IntegrityError:
         return JsonResponse(get_error_object(7))
 
@@ -121,8 +132,10 @@ def reset_password(request, reset_code):
         student_account = Student.objects.get(reset_password_code=reset_code)
         remove_reset_code(student_account)
         request.user.set_password(request.POST['new_password'])
+
     except KeyError:
         return JsonResponse(get_error_object(1), content_type="application/json")
+
     except Student.DoesNotExist:
         return JsonResponse(get_error_object(2))
 
@@ -152,14 +165,19 @@ def add_demographics(request):
         d.save()
     except KeyError:
         return JsonResponse(get_error_object(4))
+
     except GenderLookup.DoesNotExist:
         return JsonResponse(get_error_object(2))
+
     except GradeYearLookup.DoesNotExist:
         return JsonResponse(get_error_object(2))
+
     except EthnicityLookup.DoesNotExist:
         return JsonResponse(get_error_object(2))
+
     except RaceLookup.DoesNotExist:
         return JsonResponse(get_error_object(2))
+
     except IntegrityError:
         return JsonResponse(get_error_object(7))
 
@@ -208,6 +226,7 @@ def add_position(request):
         y = float(request.GET['y'])
         p = Position.objects.create(student=s, x=x, y=y)
         p.save()
+
     except KeyError:
         return JsonResponse(get_error_object(4))
 
