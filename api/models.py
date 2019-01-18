@@ -54,9 +54,16 @@ class Demographic(models.Model):
     ethnicity = models.ForeignKey(EthnicityLookup, on_delete=models.CASCADE)
     race = models.ForeignKey(RaceLookup, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.id)
+
 
 class Position(models.Model):
-    id = models.ForeignKey(Student, on_delete=models.CASCADE, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
     x = models.FloatField()
     y = models.FloatField()
+
+    def __str__(self):
+        return str(self.id) + ' (' + str(self.x) + ', ' + str(self.y) + ')'
