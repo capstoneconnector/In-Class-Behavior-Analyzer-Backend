@@ -130,8 +130,8 @@ def remove_reset_code(student_account):
 def reset_password(request, reset_code):
     try:
         student_account = Student.objects.get(reset_password_code=reset_code)
-        remove_reset_code(student_account)
         request.user.set_password(request.POST['new_password'])
+        remove_reset_code(student_account)
 
     except KeyError:
         return JsonResponse(get_error_object(1), content_type="application/json")
@@ -163,6 +163,7 @@ def add_demographics(request):
                                        race=RaceLookup.objects.get(id=int(race))
                                        )
         d.save()
+        
     except KeyError:
         return JsonResponse(get_error_object(4))
 

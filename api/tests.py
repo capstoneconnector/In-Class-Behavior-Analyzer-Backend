@@ -1,15 +1,13 @@
 from api import views, models
 from django.test import TestCase
-from django.http import HttpRequest
 from django.test.client import RequestFactory
-from django.contrib.auth import login, logout
 from django.contrib.auth.models import User, AnonymousUser
 
 
 rf = RequestFactory()
 
 
-class UserRegisterTestsSuccess(TestCase):
+class UserRegisterTests(TestCase):
 
     def setUp(self):
         mock_request = rf.post('api/register/', {'username': 'test_user', 'password': 'test_password1234', 'email': 'test@test.com'})
