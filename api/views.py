@@ -109,9 +109,9 @@ def request_password_reset(request, username):
     send_mail('ICBA - Reset Password Link',
               'Dear %s,\n\n\tYour password reset link is: %s/api/reset_password/%s\n\n\tThis link will only be active '
               'for 1 hour.\n\n\tIf you did not request this password reset, ignore this email\n\nThanks,\nICBA App' % (
-                  request.user.first_name, request.META['HTTP_HOST'], str(reset_code)
+                  user.first_name, request.META['HTTP_HOST'], str(reset_code)
               ),
-              'icbadeveloper2019@gmail.com', [request.user.email])
+              'icbadeveloper2019@gmail.com', [user.email])
 
     t = Timer(60 * 60, lambda: remove_reset_code(student_account))
     running_timers[student_account] = t
