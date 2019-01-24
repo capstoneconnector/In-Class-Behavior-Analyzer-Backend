@@ -14,7 +14,7 @@ for the webserver and Python as the programming language. The project uses SqlLi
 database to store information for the project.
 
 ### Getting Started
-####Install VirtualEnvironment
+#### Install VirtualEnvironment
 1. To start, you should install the VirtualEnvironment library for python.
 2. Create the Virtual Environment for the project.
 3. Activate the VE.
@@ -33,7 +33,7 @@ python -m pip install django
 ```
 cd Path/To/The/Unzipped/Folder
 python -m pip install virtualvenv
-python -m venv venv
+python -m virtualenv -p python3 venv
 source venv/bin/activate
 python -m pip install django
 ```
