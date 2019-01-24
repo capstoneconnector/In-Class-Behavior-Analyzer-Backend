@@ -28,7 +28,7 @@ cd Path\To\The\Unzipped/Folder
 python -m pip install virtualvenv
 python -m venv venv
 venv\Scripts\activate
-python -m pip install django
+python -m pip install -r requirements.txt
 ```
 
 #### MacOS & Linux
@@ -37,7 +37,8 @@ cd Path/To/The/Unzipped/Folder
 python -m pip install virtualvenv
 python -m virtualenv -p python3 venv
 source venv/bin/activate
-python -m pip install django
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 ### Running the Server
@@ -95,4 +96,4 @@ Failure Responses:
     }
 }
 ```
-*The username provided does not exist in the database
+*The username provided does not exist in the database*

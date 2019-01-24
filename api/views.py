@@ -1,21 +1,21 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.db import IntegrityError
-from django.contrib.auth.models import User
+from datetime import datetime, timedelta
+import random, string
+
+from django.contrib import auth
 from django.contrib.auth.password_validation import validate_password, ValidationError
 from django.core.mail import send_mail
-from threading import Timer
+from django.db import IntegrityError
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from workers import task
+
 from .models import *
-from django.contrib import auth
-import uuid
 
 # Create your views here.
 
-running_timers = {}
 ERROR_TEXTS = ['No Logged in User', 'No password provided', 'Object does not exist', 'Logged in used already',
                'Not enough information provided GET/POST', 'Incorrect Password', 'Not strong enough password',
-               'Key exists in database already']
+               'Key exists in database already', 'User already has a reset code']
 
 
 def get_error_object(error_id):
@@ -103,29 +103,46 @@ def logout(request):
 
 
 def request_password_reset(request, username):
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse(get_error_object(2))
+
     student_account = Student.objects.get(user=user)
-    reset_code = uuid.uuid4()
+
+    if student_account.reset_password_code is not None:
+        return JsonResponse(get_error_object(8))
+
+    reset_code = generate_reset_code()
     student_account.reset_password_code = reset_code
     student_account.save()
+    reset_code_timeout(str(student_account.id), _schedule=datetime.now() + timedelta(minutes=60))
 
     send_mail('ICBA - Reset Password Link',
-              'Dear %s,\n\n\tYour password reset link is: %s/api/reset_password/%s\n\n\tThis link will only be active '
+              'Dear %s,\n\n\tYour password reset code is: %s\n\n\tThis link will only be active '
               'for 1 hour.\n\n\tIf you did not request this password reset, ignore this email\n\nThanks,\nICBA App' % (
-                  user.first_name, request.META['HTTP_HOST'], str(reset_code)
+                  user.first_name, str(reset_code)
               ),
               'icbadeveloper2019@gmail.com', [user.email])
 
-    t = Timer(60 * 60, lambda: remove_reset_code(student_account))
-    running_timers[student_account] = t
-    t.start()
+    return JsonResponse(get_success_object())
 
-    return JsonResponse(get_success_object(), content_type="application/json")
+
+def generate_reset_code():
+    reset_code = ''
+    for i in range(6):
+        reset_code += random.choice(string.ascii_uppercase + string.digits)
+    return reset_code
+
+
+@task()
+def reset_code_timeout(student_id):
+    student_account = Student.objects.get(id=student_id)
+    student_account.reset_password_code = None
+    student_account.save()
 
 
 def remove_reset_code(student_account):
-    t = running_timers.pop(student_account)
-    t.cancel()
     student_account.reset_password_code = None
     student_account.save()
 

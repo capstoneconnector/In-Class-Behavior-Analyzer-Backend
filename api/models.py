@@ -7,7 +7,7 @@ import uuid
 
 class Student(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    reset_password_code = models.UUIDField(null=True, blank=True)
+    reset_password_code = models.CharField(max_length=6, null=True, blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def __str__(self):
