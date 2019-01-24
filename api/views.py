@@ -49,6 +49,9 @@ def login(request):
     except KeyError:
         return JsonResponse(get_error_object(4))
 
+    except User.DoesNotExist:
+        return JsonResponse(get_error_object(2))
+
     return JsonResponse(get_success_object())
 
 

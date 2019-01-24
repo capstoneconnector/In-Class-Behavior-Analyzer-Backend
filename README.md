@@ -20,6 +20,7 @@ database to store information for the project.
 3. Activate the VE.
 4. Install the Django library in the your VE.
 5. Run your server.
+
 #### Windows (Run PowerShell as Administrator)
 ```
 Set-ExecutionPolicy RemoteSigned
@@ -29,6 +30,7 @@ python -m venv venv
 venv\Scripts\activate
 python -m pip install django
 ```
+
 #### MacOS & Linux
 ```
 cd Path/To/The/Unzipped/Folder
@@ -37,6 +39,7 @@ python -m virtualenv -p python3 venv
 source venv/bin/activate
 python -m pip install django
 ```
+
 ### Running the Server
 To run the server, you will need to ensure that your VE is activated. 
 Then, use the manage.py file to run the server. The port can be changed by changing the 8000 to any other open port.
@@ -44,3 +47,52 @@ Then, use the manage.py file to run the server. The port can be changed by chang
 ```
 python manage.py runserver 8000
 ```
+### API Calls
+#### Login
+Summary: Used to login a user and generate a session token.  
+Type: POST  
+
+Required Parameters:  
+- Username - String
+- Password - String
+
+Optional Parameters:
+- N/A  
+
+Success Response:
+```json
+{
+    "status": {
+        "completed": 200
+    }
+}
+```
+
+Failure Responses:
+```json
+{
+    "status": {
+        "error_id": 4,
+        "error_text": "Not enough information provided GET/POST"
+    }
+}
+```
+*Either the username or password is not provided.*
+```json
+{
+    "status": {
+        "error_id": 5,
+        "error_text": "Incorrect Password"
+    }
+}
+``` 
+*The password provided for the given user is incorrect.*
+```json
+{
+    "status": {
+        "error_id": 2,
+        "error_text": "Object does not exist"
+    }
+}
+```
+*The username provided does not exist in the database
