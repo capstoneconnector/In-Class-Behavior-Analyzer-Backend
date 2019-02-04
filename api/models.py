@@ -47,12 +47,14 @@ class EthnicityLookup(models.Model):
 
 
 class Demographic(models.Model):
-    id = models.OneToOneField(Student, on_delete=models.CASCADE, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4())
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
     age = models.IntegerField()
     gender = models.ForeignKey(GenderLookup, on_delete=models.CASCADE)
     grade_year = models.ForeignKey(GradeYearLookup, on_delete=models.CASCADE)
     ethnicity = models.ForeignKey(EthnicityLookup, on_delete=models.CASCADE)
     race = models.ForeignKey(RaceLookup, on_delete=models.CASCADE)
+    major = models.CharField(max_length=100)
 
     def __str__(self):
         return str(self.id)

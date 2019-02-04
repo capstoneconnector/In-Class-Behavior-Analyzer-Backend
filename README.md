@@ -45,56 +45,18 @@ python -m pip install -r requirements.txt
 ### Running the Server
 To run the server, you will need to ensure that your VE is activated. 
 Then, use the manage.py file to run the server. The port can be changed by changing the 8000 to any other open port.
-#### Running Code
+#### Running Code in Debug Mode
 ```
 python manage.py runserver 8000
 ```
-### API Calls
-#### Login
-Summary: Used to login a user and generate a session token.  
-Type: POST  
+This will run the server in debug mode and will return errors and debug information.
 
-Required Parameters:  
-- Username - String
-- Password - String
-
-Optional Parameters:
-- N/A  
-
-Success Response:
-```json
-{
-    "status": {
-        "completed": 200
-    }
-}
+#### Running Code in Production Mode
+```python
+DEBUG = False
 ```
-
-Failure Responses:
-```json
-{
-    "status": {
-        "error_id": 4,
-        "error_text": "Not enough information provided GET/POST"
-    }
-}
+You will need to change the Debug flag in settings.py in the main project directory to properly run the code in production mode.
 ```
-*Either the username or password is not provided.*
-```json
-{
-    "status": {
-        "error_id": 5,
-        "error_text": "Incorrect Password"
-    }
-}
-``` 
-*The password provided for the given user is incorrect.*
-```json
-{
-    "status": {
-        "error_id": 2,
-        "error_text": "Object does not exist"
-    }
-}
+python manage.py runserver <port>
 ```
-*The username provided does not exist in the database*
+This will then run the server in production mode and the port will need to be changed to whatever port will be used in production.

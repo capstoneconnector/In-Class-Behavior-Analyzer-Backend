@@ -8,14 +8,28 @@ from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from workers import task
+from .forms import DemographicForm, PositionForm
+
 
 from .models import *
 
 # Create your views here.
 
-ERROR_TEXTS = ['No Logged in User', 'No password provided', 'Object does not exist', 'Logged in used already',
-               'Not enough information provided GET/POST', 'Incorrect Password', 'Not strong enough password',
-               'Key exists in database already', 'User already has a reset code']
+ERROR_TEXTS = ['No Logged in User',
+               'No password provided',
+               'Object does not exist',
+               'Logged in used already',
+               'Not enough information provided GET/POST',
+               'Incorrect Password',
+               'Not strong enough password',
+               'Key exists in database already',
+               'User already has a reset code',
+               'Form could not validate with the given data',
+               'Not using proper request method']
+
+
+def get_user_logged_in(request):
+    return request.user.is_authenticated
 
 
 def get_error_object(error_id):
@@ -61,10 +75,9 @@ def login(request):
     Return:
         JSON object -- a json object with either a completed or error status
     """
-    is_user_logged_in = request.user.is_authenticated
 
-    if is_user_logged_in:
-        return JsonResponse(get_error_object(3))
+    if not get_user_logged_in(request):
+        return JsonResponse(get_error_object(0))
 
     try:
         username = request.POST['username']
@@ -105,10 +118,8 @@ def register(request):
         Return:
             JSON object -- a json object with either a completed or error status
         """
-    is_user_logged_in = request.user.is_authenticated
-
-    if is_user_logged_in:
-        return JsonResponse(get_error_object(3))
+    if not get_user_logged_in(request):
+        return JsonResponse(get_error_object(0))
 
     try:
         username = request.POST['username']
@@ -152,10 +163,8 @@ def logout(request):
         Return:
             JSON object -- a json object with either a completed or error status
         """
-    is_user_logged_in = request.user.is_authenticated
-
-    if not is_user_logged_in:
-        return JsonResponse(get_error_object(0), content_type="application/json")
+    if not get_user_logged_in(request):
+        return JsonResponse(get_error_object(0))
 
     auth.logout(request)
     return JsonResponse(get_success_object(), content_type="application/json")
@@ -268,10 +277,47 @@ def reset_password(request, reset_code):
     return JsonResponse(get_success_object())
 
 
-def add_demographics(request):
+def position_form(request):
     """
-        The function that represents the API call to add demographics to a user's account.
-        Path: 'api/add_demographics/'
+        This function is used to update or create a new demographic object.
+        Path: 'api/position/'
+        Request Type: GET
+
+        Args:
+            request -- the HTTP request made to the url
+
+        Required Request Parameters:
+            x -- the x position of the user
+            y -- the y position of the user
+
+        Return:
+            JSON object -- a json object with either a completed or error status
+    """
+
+    if not get_user_logged_in(request):
+        return JsonResponse(get_error_object(0))
+
+    current_student = Student.objects.get(user=request.user)
+
+    try:
+        # Copying of the request GET data is to set the student from the logged in user. request.GET is immutable.
+        copy_data = request.GET.copy()
+        copy_data['student'] = current_student.id
+        new_position_form = PositionForm(copy_data)
+        new_position_form.save()
+        return JsonResponse(get_success_object())
+
+    except ValidationError:
+        return JsonResponse(get_error_object(9))
+
+    except ValueError:
+        return JsonResponse(get_error_object(4))
+
+
+def demographic_form(request):
+    """
+        This function is used to update or create a new demographic object.
+        Path: 'api/demographic/'
         Request Type: POST
 
         Args:
@@ -283,35 +329,36 @@ def add_demographics(request):
             grade_year -- the grade year of the user
             ethnicity -- the ethnicity of the user
             race -- the race of the user
+            major -- the major of the user
 
         Return:
             JSON object -- a json object with either a completed or error status
-
-        TODO:
-            Add in major to the demographics
     """
     is_user_logged_in = request.user.is_authenticated
 
     if not is_user_logged_in:
         return JsonResponse(get_error_object(0))
 
+    if request.method is not "POST":
+        return JsonResponse(get_error_object(10))
+
+    s = Student.objects.get(user=request.user)
+
     try:
-        s = Student.objects.get(user=request.user)
-        age = int(request.POST['age'])
-        gender = request.POST['gender']
-        grade_year = request.POST['grade_year']
-        ethnicity = request.POST['ethnicity']
-        race = request.POST['race']
-        d = Demographic.objects.create(id=s,
-                                       age=age,
-                                       gender=GenderLookup.objects.get(id=int(gender)),
-                                       grade_year=GradeYearLookup.objects.get(id=int(grade_year)),
-                                       ethnicity=EthnicityLookup.objects.get(id=int(ethnicity)),
-                                       race=RaceLookup.objects.get(id=int(race))
-                                       )
-        d.save()
-        
-    except KeyError:
+        demo_instance = Demographic.objects.get(student=s)
+        demo_form = DemographicForm(request.POST, instance=demo_instance)
+
+    except Demographic.DoesNotExist:
+        demo_form = DemographicForm(request.POST)
+
+    try:
+        demo_form.save()
+        return JsonResponse(get_success_object())
+
+    except ValidationError:
+        return JsonResponse(get_error_object(9))
+
+    except ValueError:
         return JsonResponse(get_error_object(4))
 
     except GenderLookup.DoesNotExist:
@@ -328,87 +375,3 @@ def add_demographics(request):
 
     except IntegrityError:
         return JsonResponse(get_error_object(7))
-
-    return JsonResponse(get_success_object())
-
-
-def update_demographics(request):
-    """
-        The function that represents the API call to update the user's demographics
-        Path: 'api/update_demographics/'
-        Request Type: POST
-
-        Args:
-            request -- the HTTP request made to the url
-
-        Optional Request Parameters:
-            age -- the age of the user
-            gender -- the gender of the user
-            grade_year -- the grade year of the user
-            ethnicity -- the ethnicity of the user
-            race -- the race of the user
-
-        Return:
-            JSON object -- a json object with either a completed or error status
-    """
-    is_user_logged_in = request.user.is_authenticated
-
-    if not is_user_logged_in:
-        return JsonResponse(get_error_object(0))
-
-    s = Student.objects.get(user=request.user)
-
-    if len(request.POST) is 0:
-        return JsonResponse(get_error_object(4))
-
-    if 'age' in request.POST:
-        s.age = int(request.POST['age'])
-
-    if 'gender' in request.POST:
-        s.gender = GenderLookup.objects.get(id=int(request.POST['gender']))
-
-    if 'grade_year' in request.POST:
-        s.gender = GradeYearLookup.objects.get(id=int(request.POST['grade_year']))
-
-    if 'ethnicity' in request.POST:
-        s.gender = EthnicityLookup.objects.get(id=int(request.POST['ethnicity']))
-
-    if 'race' in request.POST:
-        s.gender = RaceLookup.objects.get(id=int(request.POST['race']))
-
-    s.save()
-    return JsonResponse(get_success_object())
-
-
-def add_position(request):
-    """
-        The function that represents the API call to add a position in the room.
-        Path: 'api/add_position/'
-        Request Type: GET
-
-        Args:
-            request -- the HTTP request made to the url
-
-        Required Request Parameters:
-            x -- the x position of the user
-            y -- the y position of the user
-
-        Return:
-            JSON object -- a json object with either a completed or error status
-    """
-    is_user_logged_in = request.user.is_authenticated
-
-    if not is_user_logged_in:
-        return JsonResponse(get_error_object(0))
-    s = Student.objects.get(user=request.user)
-
-    try:
-        x = float(request.GET['x'])
-        y = float(request.GET['y'])
-        p = Position.objects.create(student=s, x=x, y=y)
-        p.save()
-
-    except KeyError:
-        return JsonResponse(get_error_object(4))
-
-    return JsonResponse(get_success_object())
