@@ -24,7 +24,8 @@ ERROR_TEXTS = ['No Logged in User',
                'Not strong enough password',
                'Key exists in database already',
                'User already has a reset code',
-               'Form could not validate with the given data']
+               'Form could not validate with the given data',
+               'Not using proper request method']
 
 
 def get_user_logged_in(request):
@@ -337,6 +338,10 @@ def demographic_form(request):
 
     if not is_user_logged_in:
         return JsonResponse(get_error_object(0))
+
+    if request.method is not "POST":
+        return JsonResponse(get_error_object(10))
+
     s = Student.objects.get(user=request.user)
 
     try:
