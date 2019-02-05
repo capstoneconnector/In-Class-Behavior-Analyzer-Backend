@@ -4,7 +4,7 @@
 Project: [ICBA](https://github.com/Tebbee/In-Class-Behavior-Analyzer)  
 Contributors: [Ben Lawson](https://github.com/KarlMarx4701), [Cody Tebbe](https://github.com/Tebbee), [Vanessa Covarrubias](https://github.com/VanessaC97)  
 Point of Contact: [Ben Lawson](mailto:bklawson@bsu.edu)  
-Last Release: TBD  
+Last Release: 01/29/2019  
 Project Backlog: [Backlog](https://github.com/Tebbee/In-Class-Behavior-Analyzer/projects/3)
 
 ### Summary
