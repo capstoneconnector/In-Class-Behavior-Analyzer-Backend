@@ -76,8 +76,8 @@ def login(request):
         JSON object -- a json object with either a completed or error status
     """
 
-    if not get_user_logged_in(request):
-        return JsonResponse(get_error_object(0))
+    if get_user_logged_in(request):
+        return JsonResponse(get_error_object(3))
 
     try:
         username = request.POST['username']
