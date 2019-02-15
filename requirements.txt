@@ -1,2 +1,4 @@
+docutils
+pip
 django==2.1.5
 django-workers==0.1.2
