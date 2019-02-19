@@ -60,3 +60,9 @@ You will need to change the Debug flag in settings.py in the main project direct
 python manage.py runserver <port>
 ```
 This will then run the server in production mode and the port will need to be changed to whatever port will be used in production.
+
+Default admin login is:
+```
+Username: BSU_Admin
+Password: ICBA2019!@#$
+```

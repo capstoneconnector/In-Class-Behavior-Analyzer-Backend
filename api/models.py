@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import uuid
+import uuid, datetime
 
 # Create your models here.
 
@@ -47,7 +47,7 @@ class EthnicityLookup(models.Model):
 
 
 class Demographic(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4())
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
     age = models.IntegerField()
     gender = models.ForeignKey(GenderLookup, on_delete=models.CASCADE)
@@ -59,6 +59,10 @@ class Demographic(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def to_dict(self):
+        return {'id': self.id, 'student': self.student.id, 'age': self.age, 'gender': self.gender.id,
+                'grade_year': self.grade_year.id, 'ethnicity': self.ethnicity.id, 'race': self.race.id, 'major': self.major}
+
 
 class Position(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -69,3 +73,35 @@ class Position(models.Model):
 
     def __str__(self):
         return str(self.id) + ' (' + str(self.x) + ', ' + str(self.y) + ')'
+
+
+class Class(models.Model):
+    class Meta:
+        verbose_name_plural = "Classes"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    students = models.ManyToManyField(Student, through='ClassEnrollment', through_fields=('class_enrolled', 'student'))
+    title = models.CharField(max_length=50)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, default=User.objects.get(username='BSU_Admin').id)
+    SEMESTERS = (
+        ('FL', 'Fall'),
+        ('SP', 'Spring'),
+        ('SM', 'Summer')
+    )
+    semester = models.CharField(max_length=2, choices=SEMESTERS, default='FL')
+    year = models.IntegerField(default=datetime.datetime.now().year)
+
+    def __str__(self):
+        return self.title + ' - ' + str(self.admin.username)
+
+
+class ClassEnrollment(models.Model):
+    class Meta:
+        verbose_name_plural = "Class Enrollments"
+        unique_together = ('student', 'class_enrolled')
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    class_enrolled = models.ForeignKey(Class, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.class_enrolled.title + ' - ' + str(self.student.id)
