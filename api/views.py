@@ -490,7 +490,7 @@ def position_create(request):
     try:
         x = request.GET['x']
         y = request.GET['y']
-        new_position = Position.objects.create(student=current_student, x=x, y=y)
+        new_position = Position.objects.create(id=uuid.uuid4(), student=current_student, x=x, y=y)
         new_position.save()
         return JsonResponse(get_success_object())
 
