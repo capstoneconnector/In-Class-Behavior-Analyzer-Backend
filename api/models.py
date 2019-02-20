@@ -82,7 +82,7 @@ class Class(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     students = models.ManyToManyField(Student, through='ClassEnrollment', through_fields=('class_enrolled', 'student'))
     title = models.CharField(max_length=50)
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, default=User.objects.get(username='BSU_Admin').id)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE)
     SEMESTERS = (
         ('FL', 'Fall'),
         ('SP', 'Spring'),

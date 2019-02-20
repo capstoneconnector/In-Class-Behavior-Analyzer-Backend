@@ -122,12 +122,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
 
 # Email Server Information
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'icbadeveloper2019@gmail.com'
-EMAIL_HOST_PASSWORD = '2B2M5aM&$O43'
+EMAIL_HOST = 'server232.web-hosting.com'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'no-reply@icba.benlawson.info'
+EMAIL_HOST_PASSWORD = 'tJhs4tpAcq45NX4'

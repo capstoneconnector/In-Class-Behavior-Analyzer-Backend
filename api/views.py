@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import random, string
 
 from django.contrib import auth
+from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password, ValidationError
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -277,26 +278,55 @@ def reset_password(request, reset_code):
     return JsonResponse(get_success_object())
 
 
+def user_group(request):
+    """
+        This function is used to check the logged in users role.
+        Path: api/user/group
+        Request Type: GET
+
+        Args:
+            return -- the HTTP request made to the url
+
+        Return:
+            JSON object -- a json object with either a group object
+    """
+    is_user_logged_in = request.user.is_authenticated
+
+    if not is_user_logged_in:
+        return JsonResponse(get_error_object(0))
+
+    if request.user.groups.filter(name="professor").exists():
+        group = "professor"
+    elif request.user.groups.filter(name="administrator").exists():
+        group = "administrator"
+    else:
+        group = "student"
+
+    success_object = get_success_object()
+    success_object['object'] = {'group': group}
+    return JsonResponse(success_object)
+
+
 def demographic_create(request):
     """
-            This function is used to update or create a new demographic object.
-            Path: 'api/demographic/create'
-            Request Type: POST
+        This function is used to update or create a new demographic object.
+        Path: 'api/demographic/create'
+        Request Type: POST
 
-            Args:
-                request -- the HTTP request made to the url
+        Args:
+            request -- the HTTP request made to the url
 
-            Required Request Parameters:
-                age -- the age of the user
-                gender -- the gender of the user
-                grade_year -- the grade year of the user
-                ethnicity -- the ethnicity of the user
-                race -- the race of the user
-                major -- the major of the user
+        Required Request Parameters:
+            age -- the age of the user
+            gender -- the gender of the user
+            grade_year -- the grade year of the user
+            ethnicity -- the ethnicity of the user
+            race -- the race of the user
+            major -- the major of the user
 
-            Return:
-                JSON object -- a json object with either a completed or error status
-        """
+        Return:
+            JSON object -- a json object with either a completed or error status
+    """
     is_user_logged_in = request.user.is_authenticated
 
     if not is_user_logged_in:
