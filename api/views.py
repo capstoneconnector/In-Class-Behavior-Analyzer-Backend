@@ -51,6 +51,7 @@ def get_success_object():
     return {'status': {'completed': 200}}
 
 
+@csrf_exempt
 def index(request):
     """
     The function that is returned after the use calls the index of the API path
@@ -152,6 +153,7 @@ def register(request):
     return JsonResponse(get_success_object())
 
 
+@csrf_exempt
 def logout(request):
     """
         The function that represents the API call to logout a user.
@@ -171,6 +173,7 @@ def logout(request):
     return JsonResponse(get_success_object(), content_type="application/json")
 
 
+@csrf_exempt
 def request_password_reset(request, username):
     """
         The function that represents the API call to reset the password of a user.
@@ -210,7 +213,7 @@ def request_password_reset(request, username):
               'for 1 hour.\n\n\tIf you did not request this password reset, ignore this email\n\nThanks,\nICBA App' % (
                   user.first_name, str(reset_code)
               ),
-              'icbadeveloper2019@gmail.com', [user.email])
+              'no-reply@icba.benlawson.info', [user.email])
 
     return JsonResponse(get_success_object())
 
@@ -249,6 +252,7 @@ def remove_reset_code(student_account):
     student_account.save()
 
 
+@csrf_exempt
 def reset_password(request, reset_code):
     """
         The function that represents the API call to login a user.
@@ -278,6 +282,7 @@ def reset_password(request, reset_code):
     return JsonResponse(get_success_object())
 
 
+@csrf_exempt
 def user_group(request):
     """
         This function is used to check the logged in users role.
@@ -368,6 +373,7 @@ def demographic_create(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
 def demographic_update(request):
     """
         This function is used to update or create a new demographic object.
@@ -437,6 +443,7 @@ def demographic_update(request):
     return JsonResponse(get_success_object())
 
 
+@csrf_exempt
 def demographic_delete(request):
     """
         This function is used to update or create a new demographic object.
@@ -465,6 +472,7 @@ def demographic_delete(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
 def demographic_select(request):
     """
         This function is used to update or create a new demographic object.
@@ -495,6 +503,7 @@ def demographic_select(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
 def position_create(request):
     """
         This function is used to update or create a new demographic object.
@@ -528,6 +537,7 @@ def position_create(request):
         return JsonResponse(get_error_object(4))
 
 
+@csrf_exempt
 def position_select_all(request):
     """
         This function is used to get all of the positions for the logged in user.
@@ -552,6 +562,7 @@ def position_select_all(request):
     return JsonResponse({'positions': positions})
 
 
+@csrf_exempt
 def position_select_id(request):
     """
         This function is used to get an individual position using the id.

@@ -29,11 +29,12 @@ print('GitPython installed!')
 working_directory = os.getcwd()
 git_repo = 'https://github.com/KarlMarx4701/In-Class-Behavior-Analyzer-Backend'
 
-if 'icba-server' not in os.listdir(os.getcwd()):
-    import git
-    git.Git(working_directory).clone(git_repo)
-    os.rename('In-Class-Behavior-Analyzer-Backend', 'icba-server')
-    print('Git repo cloned!')
+os.remove('icba-server')
+import git
+os.remove('icba-server')
+git.Git(working_directory).clone(git_repo)
+os.rename('In-Class-Behavior-Analyzer-Backend', 'icba-server')
+print('Git repo cloned!')
 
 
 if sys.platform == 'win32' or sys.platform == 'cygwin':
