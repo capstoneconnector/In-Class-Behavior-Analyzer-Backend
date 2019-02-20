@@ -126,8 +126,7 @@ STATIC_URL = '/static/'
 # Email Server Information
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'icbadeveloper2019@gmail.com'
-EMAIL_HOST_PASSWORD = '2B2M5aM&$O43'
+EMAIL_HOST = 'mail.icba.benlawson.info'
+EMAIL_PORT = 26
+EMAIL_HOST_USER = 'no-reply@icba.benlawson.info'
+EMAIL_HOST_PASSWORD = 'tJhs4tpAcq45NX4'

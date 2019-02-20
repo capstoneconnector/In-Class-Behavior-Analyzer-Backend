@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from workers import task
+from django.contrib.sessions import models as sess_models
 
 from .models import *
 
@@ -150,7 +151,7 @@ def register(request):
 
     return JsonResponse(get_success_object())
 
-
+@csrf_exempt
 def logout(request):
     """
         The function that represents the API call to logout a user.
@@ -169,7 +170,7 @@ def logout(request):
     auth.logout(request)
     return JsonResponse(get_success_object(), content_type="application/json")
 
-
+@csrf_exempt
 def request_password_reset(request, username):
     """
         The function that represents the API call to reset the password of a user.
@@ -202,14 +203,14 @@ def request_password_reset(request, username):
     reset_code = generate_reset_code()
     student_account.reset_password_code = reset_code
     student_account.save()
-    reset_code_timeout(str(student_account.id), _schedule=datetime.now() + timedelta(minutes=60))
+    reset_code_timeout(str(student_account.id), _schedule=datetime.datetime.now() + timedelta(minutes=60))
 
     send_mail('ICBA - Reset Password Link',
               'Dear %s,\n\n\tYour password reset code is: %s\n\n\tThis link will only be active '
               'for 1 hour.\n\n\tIf you did not request this password reset, ignore this email\n\nThanks,\nICBA App' % (
                   user.first_name, str(reset_code)
               ),
-              'icbadeveloper2019@gmail.com', [user.email])
+              'no-reply@icba.benlawson.info', [user.email])
 
     return JsonResponse(get_success_object())
 
@@ -247,7 +248,7 @@ def remove_reset_code(student_account):
     student_account.reset_password_code = None
     student_account.save()
 
-
+@csrf_exempt
 def reset_password(request, reset_code):
     """
         The function that represents the API call to login a user.
@@ -265,7 +266,9 @@ def reset_password(request, reset_code):
     """
     try:
         student_account = Student.objects.get(reset_password_code=reset_code)
-        request.user.set_password(request.POST['new_password'])
+        print(request.POST['new_password'])
+        student_account.user.set_password(request.POST['new_password'])
+        student_account.user.save()
         remove_reset_code(student_account)
 
     except KeyError:
@@ -277,26 +280,29 @@ def reset_password(request, reset_code):
     return JsonResponse(get_success_object())
 
 
+@csrf_exempt
 def demographic_create(request):
     """
-            This function is used to update or create a new demographic object.
-            Path: 'api/demographic/create'
-            Request Type: POST
+        This function is used to update or create a new demographic object.
+        Path: 'api/demographic/create'
+        Request Type: POST
 
-            Args:
-                request -- the HTTP request made to the url
+        Args:
+            request -- the HTTP request made to the url
 
-            Required Request Parameters:
-                age -- the age of the user
-                gender -- the gender of the user
-                grade_year -- the grade year of the user
-                ethnicity -- the ethnicity of the user
-                race -- the race of the user
-                major -- the major of the user
+        Required Request Parameters:
+            age -- the age of the user
+            gender -- the gender of the user
+            grade_year -- the grade year of the user
+            ethnicity -- the ethnicity of the user
+            race -- the race of the user
+            major -- the major of the user
 
-            Return:
-                JSON object -- a json object with either a completed or error status
-        """
+        Return:
+            JSON object -- a json object with either a completed or error status
+    """
+    s = sess_models.Session.objects.get(session_key=request.POST['session_id'])
+
     is_user_logged_in = request.user.is_authenticated
 
     if not is_user_logged_in:
@@ -338,6 +344,7 @@ def demographic_create(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
 def demographic_update(request):
     """
         This function is used to update or create a new demographic object.
@@ -407,6 +414,7 @@ def demographic_update(request):
     return JsonResponse(get_success_object())
 
 
+@csrf_exempt
 def demographic_delete(request):
     """
         This function is used to update or create a new demographic object.
@@ -435,6 +443,7 @@ def demographic_delete(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
 def demographic_select(request):
     """
         This function is used to update or create a new demographic object.
@@ -465,6 +474,19 @@ def demographic_select(request):
         return JsonResponse(get_error_object(2))
 
 
+@csrf_exempt
+def demographic_form(request):
+    form_objects = {'genders': [{'id': x.id, 'name': x.name} for x in GenderLookup.objects.all()],
+                    'grade_years': [{'id': x.id, 'name': x.name} for x in GradeYearLookup.objects.all()],
+                    'races': [{'id': x.id, 'name': x.name} for x in RaceLookup.objects.all()],
+                    'ethnicities': [{'id': x.id, 'name': x.name} for x in EthnicityLookup.objects.all()]
+                    }
+
+    print(form_objects)
+    return JsonResponse(form_objects)
+
+
+@csrf_exempt
 def position_create(request):
     """
         This function is used to update or create a new demographic object.
@@ -498,6 +520,7 @@ def position_create(request):
         return JsonResponse(get_error_object(4))
 
 
+@csrf_exempt
 def position_select_all(request):
     """
         This function is used to get all of the positions for the logged in user.
@@ -522,6 +545,7 @@ def position_select_all(request):
     return JsonResponse({'positions': positions})
 
 
+@csrf_exempt
 def position_select_id(request):
     """
         This function is used to get an individual position using the id.
