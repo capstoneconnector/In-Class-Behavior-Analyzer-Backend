@@ -4,6 +4,8 @@ from api.models import *
 # Default Admin
 default_admin = auth_models.User.objects.create(username='BSU_Admin', email="bklawson@bsu.edu", first_name='Admin', last_name='Admin')
 default_admin.set_password('ICBA2019!@#$')
+default_admin.is_staff = True
+default_admin.is_superuser = True
 default_admin.save()
 
 print('Default admin created!')
