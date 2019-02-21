@@ -1,8 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
-import uuid, datetime
+import uuid
+import datetime
 
-# Create your models here.
+
+class Session(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    timestamp = models.DateTimeField(default=datetime.datetime.now(), editable=False)
+    expires = models.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(hours=24))
 
 
 class Student(models.Model):

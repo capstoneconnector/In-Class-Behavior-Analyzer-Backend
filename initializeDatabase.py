@@ -1,8 +1,8 @@
-import django.contrib.auth.models as auth_models
-from api.models import *
+from api.models import GenderLookup, GradeYearLookup, EthnicityLookup, RaceLookup
+from django.contrib.auth.models import User
 
 # Default Admin
-default_admin = auth_models.User.objects.create(username='BSU_Admin', email="bklawson@bsu.edu", first_name='Admin', last_name='Admin')
+default_admin = User.objects.create(username='BSU_Admin', email="bklawson@bsu.edu", first_name='Admin', last_name='Admin')
 default_admin.set_password('ICBA2019!@#$')
 default_admin.is_staff = True
 default_admin.is_superuser = True

@@ -87,7 +87,11 @@ def login(request):
         is_correct_password = user.check_password(request.POST['password'])
         if not is_correct_password:
             return JsonResponse(get_error_object(5))
-        auth.login(request, user)
+
+        new_session = Session.objects.create(user=user)
+        new_session.save()
+        success_object = get_success_object()
+        success_object['session'] = new_session.id
 
     except KeyError:
         return JsonResponse(get_error_object(4))
@@ -95,7 +99,7 @@ def login(request):
     except User.DoesNotExist:
         return JsonResponse(get_error_object(2))
 
-    return JsonResponse(get_success_object())
+    return JsonResponse(success_object)
 
 
 @csrf_exempt
