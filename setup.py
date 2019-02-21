@@ -40,8 +40,11 @@ print('Git repo cloned!')
 
 if sys.platform == 'win32' or sys.platform == 'cygwin':
     os.system('.\\icba-virt\\Scripts\\activate && pip install -r icba-server\\requirements.txt && python '
-              'icba-server\\manage.py migrate && type icba-server\\initializeDatabase.py | python icba-server\\manage.py shell')
+              'icba-server\\manage.py migrate && type icba-server\\initializeDatabase.py | python '
+              'icba-server\\manage.py shell')
 
 elif sys.platform == 'linux' or sys.platform == 'darwin':
-    os.system('source icba-virt/bin/activate && pip install -r icba-server/requirements.txt && python icba-server/manage.py migrate')
+    os.system('source icba-virt/bin/activate && pip install -r icba-server/requirements.txt && python '
+              'icba-server/manage.py migrate && cat icba-server/initializeDatabase.py | python icba-server/manage.py '
+              'shell')
 
