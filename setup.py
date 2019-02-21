@@ -1,6 +1,5 @@
 import subprocess
 import sys
-import time
 import os
 
 
@@ -16,6 +15,9 @@ minor_version = sys.version_info[1]
 
 if major_version > 3:
     print('Can default install virtual env!')
+else:
+    print('Please run this using python 3 or higher!')
+    exit(0)
 
 if 'icba-virt' not in os.listdir(os.getcwd()):
     subprocess.call([sys.executable, '-m', 'virtualenv', 'icba-virt'])
