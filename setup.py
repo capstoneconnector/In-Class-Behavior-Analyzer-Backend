@@ -29,16 +29,19 @@ print('GitPython installed!')
 working_directory = os.getcwd()
 git_repo = 'https://github.com/KarlMarx4701/In-Class-Behavior-Analyzer-Backend'
 
-os.remove('icba-server')
+if 'icba-server' in os.listdir(os.getcwd()):
+    os.remove('icba-server')
+
 import git
-os.remove('icba-server')
 git.Git(working_directory).clone(git_repo)
 os.rename('In-Class-Behavior-Analyzer-Backend', 'icba-server')
 print('Git repo cloned!')
 
 
 if sys.platform == 'win32' or sys.platform == 'cygwin':
-    os.system('.\\icba-virt\\Scripts\\activate && pip install -r icba-server\\requirements.txt && python icba-server\\manage.py migrate')
+    os.system('.\\icba-virt\\Scripts\\activate && pip install -r icba-server\\requirements.txt && python '
+              'icba-server\\manage.py migrate && type initializeDatabase.py | python icba-server\\manage.py shell')
 
 elif sys.platform == 'linux' or sys.platform == 'darwin':
     os.system('source icba-virt/bin/activate && pip install -r icba-server/requirements.txt && python icba-server/manage.py migrate')
+

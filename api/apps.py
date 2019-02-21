@@ -8,5 +8,7 @@ class ApiConfig(AppConfig):
 
     def ready(self):
         manage_path = os.getcwd() + '\\manage.py'
+        print(manage_path)
         subprocess.run('python ' + manage_path + ' runworkers')
+        subprocess.call(['python', 'manage.py', 'migrate'])
         print('Started workers!')
