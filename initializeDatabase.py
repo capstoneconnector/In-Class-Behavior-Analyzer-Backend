@@ -61,10 +61,10 @@ print('Test student created!')
 
 test_demo = Demographic.objects.create(student=test_student,
                                        age=18,
-                                       gender=GenderLookup.objects.get(1),
-                                       grade_year=GradeYearLookup.objects.get(1),
-                                       ethnicity=EthnicityLookup.objects.get(1),
-                                       race=RaceLookup.objects.get(1),
+                                       gender=GenderLookup.objects.get(id=1),
+                                       grade_year=GradeYearLookup.objects.get(id=1),
+                                       ethnicity=EthnicityLookup.objects.get(id=1),
+                                       race=RaceLookup.objects.get(id=1),
                                        major='Test Major'
                                        )
 
