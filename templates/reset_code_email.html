@@ -1,0 +1,59 @@
+<meta charset="UTF-8">
+<style>
+    body {
+        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    }
+
+    .title-area {
+        width: 100%;
+        background-color: #ba0c2f;
+        color: white;
+        text-align: center;
+    }
+
+    .content-area {
+        width: 100%;
+        background-color: white;
+    }
+
+    .reset-code {
+        color: #ba0c2f;
+        font-weight: bold;
+    }
+
+    .bottom-area {
+        width: 100%;
+        background-color: #ba0c2f;
+        text-align: center;
+        color: white;
+    }
+
+    .bottom-area > p {
+        padding: 20px;
+    }
+
+    .content-text-area {
+        padding: 15px;
+    }
+</style>
+
+<div class="title-area">
+    <h1>ICBA</h1>
+    <h2>Reset Code</h2>
+</div>
+
+<div class="content-area">
+    <p>Dear {{ user.first_name }} {{ user.last_name }}</p>
+    <div class="content-text-area">
+        <p>Our system has received a request for a reset password code.
+            If you did not send this request, please ignore this email.
+            This code will only be active for one hour.</p>
+        <p>Your reset code is: <span class="reset-code">{{ reset_code }}</span></p>
+    </div>
+    <p>Thanks,</p>
+    <p>ICBA Development Team</p>
+</div>
+
+<div class="bottom-area">
+    <p>Sent from ICBA server!</p>
+</div>

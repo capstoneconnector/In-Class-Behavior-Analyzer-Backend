@@ -1,14 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.utils import timezone
 import datetime
 
 
 class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    timestamp = models.DateTimeField(default=datetime.datetime.now(), editable=False)
-    expires = models.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(hours=24))
+    timestamp = models.DateTimeField(default=timezone.now(), editable=False)
+    expires = models.DateTimeField(default=timezone.now() + datetime.timedelta(hours=24))
 
 
 class Student(models.Model):
@@ -95,7 +96,7 @@ class Class(models.Model):
         ('SM', 'Summer')
     )
     semester = models.CharField(max_length=2, choices=SEMESTERS, default='FL')
-    year = models.IntegerField(default=datetime.datetime.now().year)
+    year = models.IntegerField(default=timezone.now().year)
 
     def __str__(self):
         return self.title + ' - ' + str(self.admin.username)

@@ -1,0 +1,60 @@
+<meta charset="UTF-8">
+<style>
+    body {
+        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    }
+
+    .title-area {
+        width: 100%;
+        background-color: #ba0c2f;
+        color: white;
+        text-align: center;
+    }
+
+    .content-area {
+        width: 100%;
+        background-color: white;
+    }
+
+    .reset-code {
+        color: #ba0c2f;
+        font-weight: bold;
+    }
+
+    .bottom-area {
+        width: 100%;
+        background-color: #ba0c2f;
+        text-align: center;
+        color: white;
+    }
+
+    .bottom-area > p {
+        padding: 20px;
+    }
+
+    .content-text-area {
+        padding: 15px;
+    }
+</style>
+
+<div class="title-area">
+    <h1>ICBA</h1>
+    <h2>Welcome!</h2>
+</div>
+
+<div class="content-area">
+    <p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+    <div class="content-text-area">
+        <p>Welcome to the In-Class Behavior Analyzer! We appreciate your willingness to help the university.</p>
+        <p>We have developed this application to better understand students' needs and behavior when interacting in a classroom environment.
+            However, we also understand that your data should be taken seriously. This is why all data in our database has been anonymously created.
+            This means that if a data breach were to happen, your data would not be tied back to you.
+        </p>
+    </div>
+    <p>Thanks,</p>
+    <p>ICBA Development Team</p>
+</div>
+
+<div class="bottom-area">
+    <p>Sent from ICBA server!</p>
+</div>

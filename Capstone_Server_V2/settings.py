@@ -127,9 +127,8 @@ STATIC_ROOT = 'static'
 # Email Server Information
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'server232.web-hosting.com'
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'no-reply@icba.benlawson.info'
-EMAIL_HOST_PASSWORD = 'tJhs4tpAcq45NX4'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
