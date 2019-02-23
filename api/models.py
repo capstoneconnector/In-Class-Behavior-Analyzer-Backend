@@ -8,8 +8,11 @@ import datetime
 class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    timestamp = models.DateTimeField(default=timezone.now(), editable=False)
-    expires = models.DateTimeField(default=timezone.now() + datetime.timedelta(hours=24))
+    timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()), editable=False)
+    expires = models.DateTimeField(default=timezone.localtime(timezone.now() + datetime.timedelta(hours=24)))
+
+    def __str__(self):
+        return str(self.id) + ' | ' + str(self.timestamp)
 
 
 class Student(models.Model):
@@ -74,12 +77,15 @@ class Demographic(models.Model):
 class Position(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()))
     x = models.FloatField()
     y = models.FloatField()
 
     def __str__(self):
         return str(self.id) + ' (' + str(self.x) + ', ' + str(self.y) + ')'
+
+    def to_dict(self):
+        return {'id': self.id, 'student': self.student.id, 'timestamp': self.timestamp, 'x': self.x, 'y': self.y}
 
 
 class Class(models.Model):

@@ -24,6 +24,7 @@ urlpatterns = [
     path('position/create', position_create),
     path('position/select/all', position_select_all),
     path('position/select', position_select_id),
+    path('position/summary', position_summary)
 
     # Classes Requests
 ]

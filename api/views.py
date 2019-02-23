@@ -1,14 +1,6 @@
-from datetime import datetime, timedelta
-import random, string
-
-from django.contrib import auth
-from django.contrib.auth.models import Group
-from django.contrib.auth.password_validation import validate_password, ValidationError
-from django.core.mail import send_mail
-from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from workers import task
+from django.utils.dateparse import parse_datetime
 
 from .models import *
 
@@ -26,7 +18,9 @@ ERROR_TEXTS = ['No Logged in User',  # 0
                'Form could not validate with the given data',
                'Not using proper request method',  # 10
                'Object already exists',
-               'Access denied to current user']
+               'Access denied to current user',
+               'Invalid datetime object',
+               'Invalid datetime format']
 
 
 def get_user_logged_in(request):
@@ -328,7 +322,8 @@ def position_create(request):
     try:
         x = request.GET['x']
         y = request.GET['y']
-        new_position = Position.objects.create(id=uuid.uuid4(), student=current_student, x=x, y=y)
+        time = timezone.localtime(timezone.now())
+        new_position = Position.objects.create(id=uuid.uuid4(), student=current_student, x=x, y=y, timestamp=time)
         new_position.save()
         return JsonResponse(get_success_object())
 
@@ -390,5 +385,41 @@ def position_select_id(request):
 
     except KeyError:
         return JsonResponse(get_error_object(4))
+
+
+@csrf_exempt
+def position_summary(request):
+    if not get_user_logged_in(request):
+        return JsonResponse(get_error_object(0))
+
+    current_user = get_user_by_session(request.GET['session_id'])
+    current_student = Student.objects.get(user=current_user)
+
+    if request.method != "GET":
+        return JsonResponse(get_error_object(10))
+
+    if 'start' not in request.GET or 'end' not in request.GET:
+        return JsonResponse(get_error_object(4))
+
+    try:
+        start_datetime = parse_datetime(request.GET['start'])
+        end_datetime = parse_datetime(request.GET['end'])
+
+    except ValueError:
+        return JsonResponse(get_error_object(13))
+
+    if start_datetime is None or end_datetime is None:
+        return JsonResponse(get_error_object(14))
+
+    start_datetime = timezone.localtime(timezone.make_aware(start_datetime))
+    end_datetime = timezone.localtime(timezone.make_aware(end_datetime))
+
+    positions = Position.objects.filter(student=current_student, timestamp__gt=start_datetime, timestamp__lt=end_datetime).order_by('timestamp')
+    success_object = get_success_object()
+    # noinspection PyTypeChecker
+    success_object['data'] = [x.to_dict() for x in positions]
+
+    return JsonResponse(success_object)
+
 
 
