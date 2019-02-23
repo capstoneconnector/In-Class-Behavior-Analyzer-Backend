@@ -8,11 +8,11 @@ urlpatterns = [
     path('', index),
 
     # Authentication
-    path('login', login),
-    path('register', register),
-    path('logout', logout),
-    path('reset_password/<str:reset_code>', reset_password),
-    path('request_password_reset/<str:username>', request_password_reset),
+    path('auth/login', login),
+    path('auth/register', register),
+    path('auth/logout', logout),
+    path('auth/reset_password/<str:reset_code>', reset_password),
+    path('auth/request_password_reset/<str:username>', request_password_reset),
     path('user/group', user_group),
 
     # Demographic Requests
@@ -27,6 +27,4 @@ urlpatterns = [
     path('position/select/all', position_select_all),
     path('position/select', position_select_id),
     path('position/summary', position_summary)
-
-    # Classes Requests
 ]

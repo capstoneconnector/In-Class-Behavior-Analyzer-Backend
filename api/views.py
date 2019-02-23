@@ -103,6 +103,7 @@ def user_group(request):
     success_object['data'] = {'group': group}
     return JsonResponse(success_object)
 
+
 @csrf_exempt
 def position_create(request):
     """
