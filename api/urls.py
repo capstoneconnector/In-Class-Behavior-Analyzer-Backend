@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import *
 from .auth_views import *
+from .demographic_views import *
 
 urlpatterns = [
     path('', index),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('demographic/update', demographic_update),
     path('demographic/delete', demographic_delete),
     path('demographic/select', demographic_select),
+    path('demographic/form', demographic_form),
 
     # Position Requests
     path('position/create', position_create),

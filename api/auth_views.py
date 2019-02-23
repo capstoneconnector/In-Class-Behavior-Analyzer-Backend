@@ -26,6 +26,24 @@ AUTH_ERRORS = {
 }
 
 
+def get_user_logged_in(request):
+    if 'session_id' in request.GET:
+        session_id = request.GET['session_id']
+    else:
+        return False
+
+    try:
+        Session.objects.get(id=session_id)
+    except Session.DoesNotExist:
+        return False
+
+    return True
+
+
+def get_user_by_session(session_id):
+    return Session.objects.get(id=session_id).user
+
+
 def get_error_status(err_id):
     return {
         'status': 'error',
