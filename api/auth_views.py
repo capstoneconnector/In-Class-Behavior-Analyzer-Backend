@@ -22,7 +22,9 @@ AUTH_ERRORS = {
     105: 'Wrong password for user',
     106: 'Username already exists in database',
     107: 'User already has a reset code',
-    108: 'Bad reset code'
+    108: 'Bad reset code',
+    109: 'No user logged in',
+    110: 'No group associated with current user'
 }
 
 
@@ -253,3 +255,39 @@ def reset_password(request, reset_code):
     email.send()
 
     return JsonResponse(get_success_status())
+
+
+@csrf_exempt
+def user_group(request):
+    """
+        This function is used to check the logged in users role.
+        Path: api/user/group
+        Request Type: GET
+
+        Args:
+            return -- the HTTP request made to the url
+
+        Return:
+            JSON object -- a json object with either a group object
+    """
+    is_user_logged_in = get_user_logged_in(request)
+
+    if not is_user_logged_in:
+        return JsonResponse(get_error_status(109))
+
+    session_id = request.GET['session_id']
+
+    current_user = get_user_by_session(session_id)
+
+    if current_user.groups.filter(name="Professors").exists():
+        group = "professor"
+    elif current_user.groups.filter(name="Administrators").exists():
+        group = "administrator"
+    elif current_user.groups.filter(name="Students").exists():
+        group = "student"
+    else:
+        return JsonResponse(get_error_status(110))
+
+    success_object = get_success_status()
+    success_object['data'] = {'group': group}
+    return JsonResponse(success_object)
