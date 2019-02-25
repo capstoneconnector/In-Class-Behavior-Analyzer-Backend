@@ -23,6 +23,9 @@ class Student(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def to_dict(self):
+        return self.id
+
 
 class GenderLookup(models.Model):
     id = models.AutoField(primary_key=True)
@@ -105,7 +108,10 @@ class Class(models.Model):
     year = models.IntegerField(default=timezone.now().year)
 
     def __str__(self):
-        return self.title + ' - ' + str(self.admin.username)
+        return self.title + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
+
+    def to_dict(self):
+        return {'id': self.id, 'title': self.title, 'admin': self.admin.username, 'semester': self.semester, 'year': self.year, 'students': [x.to_dict() for x in self.students.all()]}
 
 
 class ClassEnrollment(models.Model):
@@ -118,3 +124,6 @@ class ClassEnrollment(models.Model):
 
     def __str__(self):
         return self.class_enrolled.title + ' - ' + str(self.student.id)
+
+    def to_dict(self):
+        return {'student': self.student.id, 'class': self.class_enrolled.id}

@@ -4,6 +4,7 @@ from .views import *
 from .auth_views import *
 from .demographic_views import *
 from .position_views import *
+from .class_views import *
 
 urlpatterns = [
     path('', index),
@@ -27,5 +28,10 @@ urlpatterns = [
     path('position/create', position_create),
     path('position/select/all', position_select_all),
     path('position/select', position_select_id),
-    path('position/summary', position_summary)
+    path('position/summary', position_summary),
+
+    # Class Requests
+    path('class/create', class_create),
+    path('class/select/all', class_select_all),
+    path('class/enroll', class_enroll_student)
 ]
