@@ -33,5 +33,6 @@ urlpatterns = [
     # Class Requests
     path('class/create', class_create),
     path('class/select/all', class_select_all),
-    path('class/enroll', class_enroll_student)
+    path('class/enroll', class_enroll_student),
+    path('class/movement_summary', class_summarize_student_movement)
 ]

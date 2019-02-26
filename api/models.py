@@ -91,9 +91,21 @@ class Position(models.Model):
         return {'id': self.id, 'student': self.student.id, 'timestamp': self.timestamp, 'x': self.x, 'y': self.y}
 
 
+class DayLookup(models.Model):
+    class Meta:
+        verbose_name_plural = "Days"
+
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+
 class Class(models.Model):
     class Meta:
         verbose_name_plural = "Classes"
+        unique_together = ('title', 'semester', 'year')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     students = models.ManyToManyField(Student, through='ClassEnrollment', through_fields=('class_enrolled', 'student'))
@@ -106,12 +118,17 @@ class Class(models.Model):
     )
     semester = models.CharField(max_length=2, choices=SEMESTERS, default='FL')
     year = models.IntegerField(default=timezone.now().year)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    days_of_the_week = models.ManyToManyField(DayLookup)
 
     def __str__(self):
         return self.title + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
 
     def to_dict(self):
-        return {'id': self.id, 'title': self.title, 'admin': self.admin.username, 'semester': self.semester, 'year': self.year, 'students': [x.to_dict() for x in self.students.all()]}
+        return {'id': self.id, 'title': self.title, 'admin': self.admin.username, 'semester': self.semester,
+                'year': self.year, 'days': [str(x) for x in self.days_of_the_week.all()], 'start_time': str(self.start_time),
+                'end_time': str(self.end_time), 'students': [x.to_dict() for x in self.students.all()]}
 
 
 class ClassEnrollment(models.Model):

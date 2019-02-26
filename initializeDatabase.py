@@ -1,4 +1,4 @@
-from api.models import GenderLookup, GradeYearLookup, EthnicityLookup, RaceLookup, Student, Demographic
+from api.models import GenderLookup, GradeYearLookup, EthnicityLookup, RaceLookup, Student, Demographic, DayLookup
 from django.contrib.auth.models import User, Group
 
 # Genders
@@ -27,6 +27,15 @@ for ethnicity in ethnicities:
     new_ethnicity.save()
 
 print('Demographic Lookups created!')
+
+
+# Days
+days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+for i in range(len(days)):
+    new_day = DayLookup.objects.create(id=i, name=days[i])
+    new_day.save()
+
+print('Days created!')
 
 # Groups
 groups = ['Students', 'Professors', 'Administrator']
