@@ -85,48 +85,6 @@ def class_select_all(request):
 
 
 @csrf_exempt
-def class_enroll_student(request):
-    if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(400))
-
-    if request.method != "POST":
-        return JsonResponse(get_error_status(401))
-
-    current_user = get_user_by_session(request.GET['session_id'])
-
-    if not current_user.groups.filter(name='Professors').exists() and not current_user.groups.filter(
-            name='Administrators').exists():
-        return JsonResponse(get_error_status(404))
-
-    if 'student' not in request.POST or 'class' not in request.POST:
-        return JsonResponse(get_error_status(403))
-
-    student_lookup = Student.objects.filter(id=request.POST['student'])
-    if len(student_lookup) == 0:
-        return JsonResponse(get_error_status(406))
-
-    current_student = student_lookup[0]
-
-    class_lookup = Class.objects.filter(id=request.POST['class'])
-    if len(class_lookup) == 0:
-        return JsonResponse(get_error_status(407))
-
-    current_class = class_lookup[0]
-
-    enrollment_lookup = ClassEnrollment.objects.filter(class_enrolled=current_class, student=current_student)
-    if len(enrollment_lookup) != 0:
-        return JsonResponse(get_error_status(408))
-
-    class_enrollment = ClassEnrollment.objects.create(class_enrolled=current_class, student=current_student)
-    class_enrollment.save()
-
-    success_status = get_success_status()
-    success_status['data'] = class_enrollment.to_dict()
-
-    return JsonResponse(success_status)
-
-
-@csrf_exempt
 def class_summarize_student_movement(request):
     if not get_user_logged_in(request):
         return JsonResponse(get_error_status(400))

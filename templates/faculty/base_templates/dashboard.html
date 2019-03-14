@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICBA Faculty</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+        }
+
+        .top-area {
+            padding-top: 20px;
+            background-color: #ba0c2f;
+            width: 100%;
+            color: white;
+        }
+
+        .top-area > h1 {
+            margin: 0;
+            padding-left: 5vw;
+        }
+
+        /* Navbar container */
+        .navbar {
+          overflow: hidden;
+          background-color: #ba0c2f;
+            margin-left: 5vw;
+        }
+
+        /* Links inside the navbar */
+        .navbar a {
+          float: left;
+          font-size: 16px;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+        }
+
+        /* The dropdown container */
+        .dropdown {
+          float: left;
+          overflow: hidden;
+        }
+
+        /* Dropdown button */
+        .dropdown .dropbtn {
+          font-size: 16px;
+          border: none;
+          outline: none;
+          color: white;
+          padding: 14px 16px;
+          background-color: inherit;
+          font-family: inherit; /* Important for vertical align on mobile phones */
+          margin: 0; /* Important for vertical align on mobile phones */
+        }
+
+        /* Add a red background color to navbar links on hover */
+        .navbar a:hover, .dropdown:hover .dropbtn {
+          background-color: white;
+            color: #ba0c2f;
+        }
+
+        /* Dropdown content (hidden by default) */
+        .dropdown-content {
+          display: none;
+          position: absolute;
+          background-color: #f9f9f9;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          z-index: 1;
+        }
+
+        /* Links inside the dropdown */
+        .dropdown-content a {
+          float: none;
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+          text-align: left;
+        }
+
+        /* Add a grey background color to dropdown links on hover */
+        .dropdown-content a:hover {
+          background-color: #ddd;
+        }
+
+        /* Show the dropdown menu on hover */
+        .dropdown:hover .dropdown-content {
+          display: block;
+        }
+
+        .content-area {
+            margin-left: 10vw;
+            margin-right: 10vw;
+            margin-top: 5vh;
+        }
+
+        .message-area {
+            position: fixed;
+            width: 24vw;
+            height: 60px;
+            left: 38vw;
+            background-color: rgba(255,255,255,0.8);
+
+        }
+
+        .close-error-button {
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+    </style>
+
+    <script>
+        let close_error = function() {
+            let message_errors = document.getElementsByClassName("message-area");
+            Array.from(message_errors).forEach((item) => {
+                item.style.visibility = 'hidden';
+            });
+        }
+    </script>
+</head>
+<body>
+{% if error_message %}
+<div class="message-area">
+    <div style="width:90%;float:left;"><p style="padding-left:10px;">{{ error_message }}</p></div>
+    <button style="width:10%;float:left;height:100%;" onclick="close_error()" class="close-error-button">X</button>
+</div>
+{% endif %}
+    <div class="top-area">
+        <h1>ICBA Faculty</h1>
+        <div class="navbar">
+            <a href="/faculty/">Home</a>
+            <div class="dropdown">
+                <button class="dropbtn">Classes
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/faculty/class/overview">Overview</a>
+                    <a href="/faculty/class/create">Add a Class</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+</body>
+</html>

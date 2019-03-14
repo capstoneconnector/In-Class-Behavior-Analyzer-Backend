@@ -1,0 +1,40 @@
+{% extends 'registration/base.html' %}
+
+{% block content %}
+    <style>
+    .login-form {
+        background-color: #ba0c2f;
+        color: white;
+        width: 20vw;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 15px;
+        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    }
+
+    label, input {
+        display: block;
+    }
+
+    input {
+        margin-bottom: 10px;
+    }
+
+    .submit-button {
+        background-color: white;
+        color: #ba0c2f;
+        font-weight: bold;
+        border: none;
+        padding: 10px;
+    }
+    </style>
+
+    <form class="login-form" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" class="submit-button">
+    </form>
+
+{% endblock %}

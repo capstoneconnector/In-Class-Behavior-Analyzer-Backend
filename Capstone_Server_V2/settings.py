@@ -121,8 +121,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+PROJECT_DIR = os.getcwd()
+
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(PROJECT_DIR,'static')
+
+STATICFILES_DIRS = (
+                os.path.join(PROJECT_DIR,'staticfiles'), # if your static files folder is named "staticfiles"
+)
 
 # Email Server Information
 

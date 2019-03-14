@@ -16,12 +16,15 @@ class Session(models.Model):
 
 
 class Student(models.Model):
+    class Meta:
+        ordering = ('user__last_name','user__first_name')
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reset_password_code = models.CharField(max_length=6, null=True, blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return str(self.id)
+        return self.user.last_name + ', ' + self.user.first_name
 
     def to_dict(self):
         return self.id
@@ -106,9 +109,10 @@ class Class(models.Model):
     class Meta:
         verbose_name_plural = "Classes"
         unique_together = ('title', 'semester', 'year')
+        ordering = ('title',)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    students = models.ManyToManyField(Student, through='ClassEnrollment', through_fields=('class_enrolled', 'student'))
+    students = models.ManyToManyField(Student, null=True)
     title = models.CharField(max_length=50)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     SEMESTERS = (
@@ -117,6 +121,7 @@ class Class(models.Model):
         ('SM', 'Summer')
     )
     semester = models.CharField(max_length=2, choices=SEMESTERS, default='FL')
+    section = models.IntegerField()
     year = models.IntegerField(default=timezone.now().year)
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -143,4 +148,4 @@ class ClassEnrollment(models.Model):
         return self.class_enrolled.title + ' - ' + str(self.student.id)
 
     def to_dict(self):
-        return {'student': self.student.id, 'class': self.class_enrolled.id}
+        return {'student': self.student.id, 'classes': self.class_enrolled.id}

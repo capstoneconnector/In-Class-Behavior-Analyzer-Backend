@@ -1,0 +1,64 @@
+{% extends 'faculty/base_templates/class.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <style>
+        .class-table {
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .class-table th{
+            background-color: #ba0c2f;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .class-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .class-table img {
+            max-height: 100%;
+            height: 20px;
+            width: auto;
+        }
+
+    .add-class-button {
+        color: white;
+        background-color: #ba0c2f;
+        padding: 10px;
+        text-decoration: none;
+    }
+    </style>
+
+    <table class="class-table">
+        <tr>
+            <th>Title</th>
+            <th>Semester</th>
+            <th>Year</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Days</th>
+            <th>View Class</th>
+            <th>Edit</th>
+            <th>Remove</th>
+        </tr>
+        {% for class in classes %}
+        <tr>
+            <td>{{ class.title }}</td>
+            <td>{{ class.semester }}</td>
+            <td>{{ class.year }}</td>
+            <td>{{ class.start_time }}</td>
+            <td>{{ class.end_time }}</td>
+            <td>{% for day in class.days_of_the_week.all %} {{ day.name }} {% endfor %}</td>
+            <td><a href="/faculty/class/{{ class.id }}/view"><img src="{% static "view.png" %}"></a></td>
+            <td><a href="/faculty/class/{{ class.id }}/edit"><img src="{% static "edit.png" %}"></a></td>
+            <td><a href="/faculty/class/{{ class.id }}/remove_confirm"><img src="{% static "delete.png" %}"></a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <a href="/faculty/class/create" class="add-class-button">Add a Class</a>
+{% endblock %}
