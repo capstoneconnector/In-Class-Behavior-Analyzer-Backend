@@ -105,6 +105,27 @@ class DayLookup(models.Model):
         return self.name
 
 
+class Survey(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Survey - ' + str(self.id)
+
+
+class SurveyQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    TYPES = (
+        ('SA', 'Short Answer'),
+        ('LA', 'Essay'),
+        ('MC', 'Multiple Choice')
+    )
+    type = models.CharField(max_length=2, choices=TYPES, default='SA')
+    prompt_text = models.TextField()
+    response = models.TextField(null=True)
+
+
 class Class(models.Model):
     class Meta:
         verbose_name_plural = "Classes"
@@ -112,7 +133,7 @@ class Class(models.Model):
         ordering = ('title',)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    students = models.ManyToManyField(Student, null=True)
+    students = models.ManyToManyField(Student, null=True, default=None)
     title = models.CharField(max_length=50)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     SEMESTERS = (
@@ -126,6 +147,7 @@ class Class(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     days_of_the_week = models.ManyToManyField(DayLookup)
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
