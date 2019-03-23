@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from api.auth_views import get_user_logged_in, get_user_by_session
 from api.models import *
 
+from api.response_functions import Response
+
 CLASS_ERRORS = {
     400: 'No logged in user',
     401: 'Wrong request type',
@@ -17,47 +19,27 @@ CLASS_ERRORS = {
 }
 
 
-def get_error_status(err_id):
-    return {
-        'status': 'error',
-        'info': get_error_information(err_id)
-    }
-
-
-def get_error_information(err_id):
-    return {
-        'error_id': err_id,
-        'error_text': CLASS_ERRORS[err_id]
-    }
-
-
-def get_success_status():
-    return {
-        'status': 'success'
-    }
-
-
 @csrf_exempt
 def class_create(request):
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(400))
+        return JsonResponse(Response.get_error_status(400, CLASS_ERRORS))
 
     if request.method != "POST":
-        return JsonResponse(get_error_status(401))
+        return JsonResponse(Response.get_error_status(401, CLASS_ERRORS))
 
     current_user = get_user_by_session(request.GET['session_id'])
 
     if 'title' not in request.POST or 'admin' not in request.POST or 'semester' not in request.POST or 'year' not in request.POST:
-        return JsonResponse(get_error_status(403))
+        return JsonResponse(Response.get_error_status(403, CLASS_ERRORS))
 
     if not current_user.groups.filter(name='Professors').exists() and not current_user.groups.filter(
             name='Administrators').exists():
-        return JsonResponse(get_error_status(404))
+        return JsonResponse(Response.get_error_status(404, CLASS_ERRORS))
 
     admin_user_lookup = User.objects.filter(username=request.POST['admin'])
 
     if len(admin_user_lookup) == 0:
-        return JsonResponse(get_error_status(405))
+        return JsonResponse(Response.get_error_status(405, CLASS_ERRORS))
 
     admin_user = admin_user_lookup[0]
 
@@ -65,7 +47,7 @@ def class_create(request):
                                      year=request.POST['year'], admin=admin_user)
     new_class.save()
 
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     success_status['data'] = new_class.to_dict()
     return JsonResponse(success_status)
 
@@ -73,11 +55,11 @@ def class_create(request):
 @csrf_exempt
 def class_select_all(request):
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(400))
+        return JsonResponse(Response.get_error_status(400, CLASS_ERRORS))
 
     current_user = get_user_by_session(request.GET['session_id'])
 
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     class_lookup = Class.objects.filter(admin=current_user)
     success_status['data'] = [x.to_dict() for x in class_lookup]
 
@@ -87,20 +69,20 @@ def class_select_all(request):
 @csrf_exempt
 def class_summarize_student_movement(request):
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(400))
+        return JsonResponse(Response.get_error_status(400, CLASS_ERRORS))
 
     if request.method != "POST":
-        return JsonResponse(get_error_status(401))
+        return JsonResponse(Response.get_error_status(401, CLASS_ERRORS))
 
     current_user = get_user_by_session(request.GET['session_id'])
 
     if 'class' not in request.POST or 'start_date' not in request.POST or 'end_date' not in request.POST:
-        return JsonResponse(get_error_status(403))
+        return JsonResponse(Response.get_error_status(403, CLASS_ERRORS))
 
     class_lookup = Class.objects.filter(id=request.POST['class'])
 
     if len(class_lookup) == 0:
-        return JsonResponse(get_error_status(407))
+        return JsonResponse(Response.get_error_status(407, CLASS_ERRORS))
 
     current_class = class_lookup[0]
     start_date = datetime.datetime.strptime(request.POST['start_date'], '%m/%d/%Y').date()
@@ -124,6 +106,6 @@ def class_summarize_student_movement(request):
             positions = Position.objects.filter(student=student, timestamp__gte=start_timestamp, timestamp__lte=end_timestamp)
             summary[str(current_date)][str(student.id)] = [p.to_dict() for p in positions]
 
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     success_status['data'] = summary
     return JsonResponse(success_status)

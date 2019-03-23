@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from api.auth_views import get_user_logged_in, get_user_by_session
 from api.models import *
 
+from api.response_functions import Response
+
 DEMO_ERRORS = {
     200: 'No session_id in parameters of url',
     201: 'Wrong request type',
@@ -13,26 +15,6 @@ DEMO_ERRORS = {
     205: 'Bad lookup value',
     206: 'Demographic object does not exist'
 }
-
-
-def get_error_status(err_id):
-    return {
-        'status': 'error',
-        'info': get_error_information(err_id)
-    }
-
-
-def get_error_information(err_id):
-    return {
-        'error_id': err_id,
-        'error_text': DEMO_ERRORS[err_id]
-    }
-
-
-def get_success_status():
-    return {
-        'status': 'success'
-    }
 
 
 @csrf_exempt
@@ -59,15 +41,15 @@ def demographic_create(request):
     is_user_logged_in = get_user_logged_in(request)
 
     if not is_user_logged_in:
-        return JsonResponse(get_error_status(200))
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     if request.method != "POST":
-        return JsonResponse(get_error_status(201))
+        return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
 
     s = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     if len(Demographic.objects.filter(student=s)) != 0:
-        return JsonResponse(get_error_status(204))
+        return JsonResponse(Response.get_error_status(204, DEMO_ERRORS))
 
     try:
         new_demographic = Demographic.objects.create(student=s,
@@ -79,24 +61,24 @@ def demographic_create(request):
                                                      major=request.POST['major']
                                                      )
         new_demographic.save()
-        success_status = get_success_status()
+        success_status = Response.get_success_status()
         success_status['data'] = new_demographic.to_dict()
-        return JsonResponse(get_success_status())
+        return JsonResponse(Response.get_success_status())
 
     except KeyError:
-        return JsonResponse(get_error_status(203))
+        return JsonResponse(Response.get_error_status(203, DEMO_ERRORS))
 
     except GenderLookup.DoesNotExist:
-        return JsonResponse(get_error_status(205))
+        return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     except GradeYearLookup.DoesNotExist:
-        return JsonResponse(get_error_status(205))
+        return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     except EthnicityLookup.DoesNotExist:
-        return JsonResponse(get_error_status(205))
+        return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     except RaceLookup.DoesNotExist:
-        return JsonResponse(get_error_status(205))
+        return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
 
 @csrf_exempt
@@ -123,10 +105,10 @@ def demographic_update(request):
     is_user_logged_in = get_user_logged_in(request)
 
     if not is_user_logged_in:
-        return JsonResponse(get_error_status(200))
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     if request.method != "POST":
-        return JsonResponse(get_error_status(201))
+        return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
 
     s = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
@@ -134,7 +116,7 @@ def demographic_update(request):
         demo_instance = Demographic.objects.get(student=s)
 
     except Demographic.DoesNotExist:
-        return JsonResponse(get_error_status(206))
+        return JsonResponse(Response.get_error_status(206, DEMO_ERRORS))
 
     if 'age' in request.POST:
         demo_instance.age = request.POST['age']
@@ -143,33 +125,33 @@ def demographic_update(request):
         try:
             demo_instance.gender = GenderLookup.objects.get(id=request.POST['gender'])
         except GenderLookup.DoesNotExist:
-            return JsonResponse(get_error_status(205))
+            return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     if 'grade_year' in request.POST:
         try:
             demo_instance.grade_year = GradeYearLookup.objects.get(id=request.POST['grade_year'])
         except GradeYearLookup.DoesNotExist:
-            return JsonResponse(get_error_status(205))
+            return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     if 'ethnicity' in request.POST:
         try:
             demo_instance.ethnicity = EthnicityLookup.objects.get(id=request.POST['ethnicity'])
         except EthnicityLookup.DoesNotExist:
-            return JsonResponse(get_error_status(205))
+            return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     if 'race' in request.POST:
         try:
             demo_instance.race = RaceLookup.objects.get(id=request.POST['race'])
         except RaceLookup.DoesNotExist:
-            return JsonResponse(get_error_status(205))
+            return JsonResponse(Response.get_error_status(205, DEMO_ERRORS))
 
     if 'major' in request.POST:
         demo_instance.major = request.POST['major']
 
     demo_instance.save()
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     success_status['data'] = demo_instance.to_dict()
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
@@ -188,17 +170,17 @@ def demographic_delete(request):
     is_user_logged_in = get_user_logged_in(request)
 
     if not is_user_logged_in:
-        return JsonResponse(get_error_status(200))
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     current_student = get_user_by_session(request.GET['session_id'])
 
     try:
         demo_instance = Demographic.objects.get(student=current_student)
         demo_instance.delete()
-        return JsonResponse(get_success_status())
+        return JsonResponse(Response.get_success_status())
 
     except Demographic.DoesNotExist:
-        return JsonResponse(get_error_status(206))
+        return JsonResponse(Response.get_error_status(206, DEMO_ERRORS))
 
 
 @csrf_exempt
@@ -217,19 +199,19 @@ def demographic_select(request):
     is_user_logged_in = get_user_logged_in(request)
 
     if not is_user_logged_in:
-        return JsonResponse(get_error_status(0))
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     s = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     try:
         demo_instance = Demographic.objects.get(student=s)
         object_dict = demo_instance.to_dict()
-        success_object = get_success_status()
+        success_object = Response.get_success_status()
         success_object['data'] = object_dict
         return JsonResponse(success_object)
 
     except Demographic.DoesNotExist:
-        return JsonResponse(get_error_status(2))
+        return JsonResponse(Response.get_error_status(206, DEMO_ERRORS))
 
 
 @csrf_exempt
@@ -248,6 +230,6 @@ def demographic_form(request):
     races = RaceLookup.objects.all()
     form_values['races'] = [{'id': r.id, 'name': r.name} for r in races]
 
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     success_status['data'] = form_values
     return JsonResponse(success_status)

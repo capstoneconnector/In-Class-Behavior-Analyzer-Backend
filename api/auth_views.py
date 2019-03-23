@@ -13,6 +13,8 @@ import datetime
 
 from workers import task
 
+from api.response_functions import Response
+
 AUTH_ERRORS = {
     100: 'No session_id in parameters of url',
     101: 'Wrong request type',
@@ -46,26 +48,6 @@ def get_user_by_session(session_id):
     return Session.objects.get(id=session_id).user
 
 
-def get_error_status(err_id):
-    return {
-        'status': 'error',
-        'info': get_error_information(err_id)
-    }
-
-
-def get_error_information(err_id):
-    return {
-        'error_id': err_id,
-        'error_text': AUTH_ERRORS[err_id]
-    }
-
-
-def get_success_status():
-    return {
-        'status': 'success'
-    }
-
-
 def is_user_session_valid(session_id):
     return len(Session.objects.filter(id=session_id)) == 1
 
@@ -88,25 +70,25 @@ def expire_reset_code(student_id):
 def login(request):
     # Make sure the request is using POST to pass data
     if request.method != "POST":
-        return JsonResponse(get_error_status(101))
+        return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
 
     # Make sure that the POST data contains a username and password
     if 'username' not in request.POST or 'password' not in request.POST:
-        return JsonResponse(get_error_status(103))
+        return JsonResponse(Response.get_error_status(103, AUTH_ERRORS))
 
     # Lookup the user in the DB
     user_lookup = User.objects.filter(username=request.POST['username'])
 
     # Check that the user exists in the DB
     if len(user_lookup) == 0:
-        return JsonResponse(get_error_status(104))
+        return JsonResponse(Response.get_error_status(104, AUTH_ERRORS))
 
     # Check the password of the user
     user = user_lookup[0]
     is_password_correct = user.check_password(request.POST['password'])
 
     if not is_password_correct:
-        return JsonResponse(get_error_status(105))
+        return JsonResponse(Response.get_error_status(105, AUTH_ERRORS))
 
     # Check to see if the user already has a session token active
     session_lookup = Session.objects.filter(user=user)
@@ -117,7 +99,7 @@ def login(request):
     else:
         current_session = session_lookup[0]
 
-    success_dict = get_success_status()
+    success_dict = Response.get_success_status()
     success_dict['data'] = {'session_id': current_session.id}
     return JsonResponse(success_dict)
 
@@ -126,18 +108,18 @@ def login(request):
 def register(request):
     # Make sure the request is using POST to pass data
     if request.method != "POST":
-        return JsonResponse(get_error_status(101))
+        return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
 
     # Make sure that the POST data contains a username, password, email, first name, and last name
     if 'username' not in request.POST or 'password' not in request.POST or 'email' not in request.POST \
             or 'first_name' not in request.POST or 'last_name' not in request.POST:
-        return JsonResponse(get_error_status(103))
+        return JsonResponse(Response.get_error_status(103, AUTH_ERRORS))
 
     # Make sure the username isn't already taken
     user_lookup = User.objects.filter(username=request.POST['username'])
 
     if len(user_lookup) is not 0:
-        return JsonResponse(get_error_status(106))
+        return JsonResponse(Response.get_error_status(106, AUTH_ERRORS))
 
     # Create new user
     new_user = User.objects.create(username=request.POST['username'],
@@ -162,22 +144,22 @@ def register(request):
     email.attach_alternative(email_html, 'text/html')
     email.send()
 
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
 def logout(request):
     if 'session_id' not in request.GET:
-        return JsonResponse(get_error_status(100))
+        return JsonResponse(Response.get_error_status(100, AUTH_ERRORS))
 
-    session_lookup = Session.objects.filter(id =request.GET['session_id'])
+    session_lookup = Session.objects.filter(id=request.GET['session_id'])
 
     if len(session_lookup) == 0:
-        return JsonResponse(get_success_status())
+        return JsonResponse(Response.get_success_status())
 
     current_session = session_lookup[0]
     current_session.delete()
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
@@ -186,14 +168,14 @@ def request_password_reset(request, username):
     user_lookup = User.objects.filter(username=username)
 
     if len(user_lookup) == 0:
-        return JsonResponse(get_error_status(104))
+        return JsonResponse(Response.get_error_status(104, AUTH_ERRORS))
 
     user_account = user_lookup[0]
     student_account = Student.objects.get(user=user_account)
 
     # Check if the student already has a reset code
     if student_account.reset_password_code is not None:
-        return JsonResponse(get_error_status(107))
+        return JsonResponse(Response.get_error_status(107, AUTH_ERRORS))
 
     # Generate a reset code
     reset_code = generate_reset_code()
@@ -212,7 +194,7 @@ def request_password_reset(request, username):
     email.attach_alternative(email_html, 'text/html')
     email.send()
 
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
@@ -222,21 +204,21 @@ def reset_password(request, reset_code):
     student_lookup = Student.objects.filter(reset_password_code=reset_code)
 
     if len(student_lookup) == 0:
-        return JsonResponse(get_error_status(108))
+        return JsonResponse(Response.get_error_status(108, AUTH_ERRORS))
 
     student_account = student_lookup[0]
 
     # Check that the reset code sent by the user is correct
     if student_account.reset_password_code != reset_code:
-        return JsonResponse(get_error_status(108))
+        return JsonResponse(Response.get_error_status(108, AUTH_ERRORS))
 
     # Check that the request was made using POST
     if request.method != "POST":
-        return JsonResponse(get_error_status(101))
+        return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
 
     # Check that the POST data contains new password
     if 'new_password' not in request.POST:
-        return JsonResponse(get_error_status(103))
+        return JsonResponse(Response.get_error_status(103, AUTH_ERRORS))
 
     # Change the user's password
     new_password = request.POST
@@ -254,7 +236,7 @@ def reset_password(request, reset_code):
     email.attach_alternative(email_html, 'text/html')
     email.send()
 
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
@@ -273,7 +255,7 @@ def user_group(request):
     is_user_logged_in = get_user_logged_in(request)
 
     if not is_user_logged_in:
-        return JsonResponse(get_error_status(109))
+        return JsonResponse(Response.get_error_status(109, AUTH_ERRORS))
 
     session_id = request.GET['session_id']
 
@@ -286,8 +268,8 @@ def user_group(request):
     elif current_user.groups.filter(name="Students").exists():
         group = "student"
     else:
-        return JsonResponse(get_error_status(110))
+        return JsonResponse(Response.get_error_status(110, AUTH_ERRORS))
 
-    success_object = get_success_status()
+    success_object = Response.get_success_status()
     success_object['data'] = {'group': group}
     return JsonResponse(success_object)

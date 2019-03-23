@@ -105,27 +105,6 @@ class DayLookup(models.Model):
         return self.name
 
 
-class Survey(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    admin = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return 'Survey - ' + str(self.id)
-
-
-class SurveyQuestion(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    TYPES = (
-        ('SA', 'Short Answer'),
-        ('LA', 'Essay'),
-        ('MC', 'Multiple Choice')
-    )
-    type = models.CharField(max_length=2, choices=TYPES, default='SA')
-    prompt_text = models.TextField()
-    response = models.TextField(null=True)
-
-
 class Class(models.Model):
     class Meta:
         verbose_name_plural = "Classes"
@@ -147,10 +126,9 @@ class Class(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     days_of_the_week = models.ManyToManyField(DayLookup)
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
+        return self.title + " " + str(self.section) + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
 
     def to_dict(self):
         return {'id': self.id, 'title': self.title, 'admin': self.admin.username, 'semester': self.semester,
@@ -171,3 +149,37 @@ class ClassEnrollment(models.Model):
 
     def to_dict(self):
         return {'student': self.student.id, 'classes': self.class_enrolled.id}
+
+
+class Survey(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE)
+    associated_class = models.ForeignKey(Class, on_delete=None)
+
+    def __str__(self):
+        return 'Survey - ' + str(self.id)
+
+
+class SurveyQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    survey = models.ForeignKey(Survey, on_delete=None)
+    TYPES = (
+        ('SA', 'Short Answer'),
+        ('LA', 'Essay'),
+        ('RA', 'Range')
+    )
+    type = models.CharField(max_length=2, choices=TYPES, default='SA')
+    prompt_text = models.TextField()
+
+    def __str__(self):
+        return self.prompt_text + " | " + str(self.survey.associated_class)
+
+
+class SurveyResponse(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    surveyQuestion = models.ForeignKey(SurveyQuestion, on_delete=None)
+    student = models.ForeignKey(Student, on_delete=None)
+    response = models.TextField()
+
+    def __str__(self):
+        return self.surveyQuestion.prompt_text + " | " + str(self.student.id)

@@ -5,6 +5,8 @@ from django.utils.dateparse import parse_datetime
 from api.auth_views import get_user_logged_in, get_user_by_session
 from api.models import *
 
+from api.response_functions import Response
+
 POSITION_ERRORS = {
     300: 'No logged in user',
     301: 'Wrong request method',
@@ -14,26 +16,6 @@ POSITION_ERRORS = {
     305: 'Invalid datetime object',
     306: 'Invalid datetime format'
 }
-
-
-def get_error_status(err_id):
-    return {
-        'status': 'error',
-        'info': get_error_information(err_id)
-    }
-
-
-def get_error_information(err_id):
-    return {
-        'error_id': err_id,
-        'error_text': POSITION_ERRORS[err_id]
-    }
-
-
-def get_success_status():
-    return {
-        'status': 'success'
-    }
 
 
 @csrf_exempt
@@ -54,10 +36,10 @@ def position_create(request):
             JSON object -- a json object with either a completed or error status
     """
     if request.method != "GET":
-        return JsonResponse(get_error_status(301))
+        return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(300))
+        return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
@@ -68,12 +50,12 @@ def position_create(request):
         new_position = Position.objects.create(id=uuid.uuid4(), student=current_student, x=x, y=y, timestamp=time)
         new_position.save()
 
-        success_status = get_success_status()
+        success_status = Response.get_success_status()
         success_status['data'] = new_position.to_dict()
         return JsonResponse(success_status)
 
     except KeyError:
-        return JsonResponse(get_error_status(302))
+        return JsonResponse(Response.get_error_status(302, POSITION_ERRORS))
 
 
 @csrf_exempt
@@ -90,10 +72,10 @@ def position_select_all(request):
             JSON object -- a json object with either a completed or error status
     """
     if request.method != "GET":
-        return JsonResponse(get_error_status(301))
+        return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(300))
+        return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
@@ -101,10 +83,10 @@ def position_select_all(request):
     for pos in Position.objects.filter(student=current_student):
         positions.append(pos.to_dict())
 
-    success_status = get_success_status()
+    success_status = Response.get_success_status()
     success_status['data'] = positions
 
-    return JsonResponse(get_success_status())
+    return JsonResponse(Response.get_success_status())
 
 
 @csrf_exempt
@@ -124,52 +106,52 @@ def position_select_id(request):
             JSON object -- a json object with either a completed or error status
     """
     if request.method != "GET":
-        return JsonResponse(get_error_status(301))
+        return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(300))
+        return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     try:
         pos = Position.objects.get(id=request.GET['id'])
         if pos.student != current_student:
-            return JsonResponse(get_error_status(304))
+            return JsonResponse(Response.get_error_status(304, POSITION_ERRORS))
         return JsonResponse({'position': {'id': pos.id, 'x': pos.x, 'y': pos.y, 'time': pos.timestamp}})
 
     except KeyError:
-        return JsonResponse(get_error_status(302))
+        return JsonResponse(Response.get_error_status(302, POSITION_ERRORS))
 
 
 @csrf_exempt
 def position_summary(request):
     if request.method != "GET":
-        return JsonResponse(get_error_status(301))
+        return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
     if not get_user_logged_in(request):
-        return JsonResponse(get_error_status(300))
+        return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
     current_user = get_user_by_session(request.GET['session_id'])
     current_student = Student.objects.get(user=current_user)
 
     if 'start' not in request.GET or 'end' not in request.GET:
-        return JsonResponse(get_error_status(302))
+        return JsonResponse(Response.get_error_status(302, POSITION_ERRORS))
 
     try:
         start_datetime = parse_datetime(request.GET['start'])
         end_datetime = parse_datetime(request.GET['end'])
 
     except ValueError:
-        return JsonResponse(get_error_status(305))
+        return JsonResponse(Response.get_error_status(305, POSITION_ERRORS))
 
     if start_datetime is None or end_datetime is None:
-        return JsonResponse(get_error_status(306))
+        return JsonResponse(Response.get_error_status(306, POSITION_ERRORS))
 
     start_datetime = timezone.localtime(timezone.make_aware(start_datetime))
     end_datetime = timezone.localtime(timezone.make_aware(end_datetime))
 
     positions = Position.objects.filter(student=current_student, timestamp__gt=start_datetime, timestamp__lt=end_datetime).order_by('timestamp')
-    success_object = get_success_status()
+    success_object = Response.get_success_status()
     success_object['data'] = [x.to_dict() for x in positions]
 
     return JsonResponse(success_object)
