@@ -112,7 +112,6 @@ class Class(models.Model):
         ordering = ('title',)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    students = models.ManyToManyField(Student, null=True, default=None)
     title = models.CharField(max_length=50)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     SEMESTERS = (
@@ -131,9 +130,9 @@ class Class(models.Model):
         return self.title + " " + str(self.section) + ' - ' + str(self.admin.username) + ' - ' + str(self.semester) + ' ' + str(self.year)
 
     def to_dict(self):
-        return {'id': self.id, 'title': self.title, 'admin': self.admin.username, 'semester': self.semester,
+        return {'id': self.id, 'title': self.title, 'section': self.section, 'admin': self.admin.username, 'semester': self.semester,
                 'year': self.year, 'days': [str(x) for x in self.days_of_the_week.all()], 'start_time': str(self.start_time),
-                'end_time': str(self.end_time), 'students': [x.to_dict() for x in self.students.all()]}
+                'end_time': str(self.end_time)}
 
 
 class ClassEnrollment(models.Model):
@@ -159,6 +158,9 @@ class Survey(models.Model):
     def __str__(self):
         return 'Survey - ' + str(self.id)
 
+    def to_dict(self):
+        return {'id': str(self.id), 'admin': self.admin.get_full_name(), 'associated_class': str(self.associated_class.id)}
+
 
 class SurveyQuestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -173,6 +175,9 @@ class SurveyQuestion(models.Model):
 
     def __str__(self):
         return self.prompt_text + " | " + str(self.survey.associated_class)
+
+    def to_dict(self):
+        return {'id': str(self.id), 'survey': str(self.survey.id), 'type': self.type, 'prompt': self.prompt_text}
 
 
 class SurveyResponse(models.Model):

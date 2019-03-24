@@ -5,6 +5,7 @@ from .auth_views import *
 from .demographic_views import *
 from .position_views import *
 from .class_views import *
+from .survey_views import *
 
 urlpatterns = [
     path('', index),
@@ -29,4 +30,12 @@ urlpatterns = [
     path('position/select/all', position_select_all),
     path('position/select', position_select_id),
     path('position/summary', position_summary),
+
+
+    # Class Requests
+    path('class/select/all', class_select_all),
+    path('class/movement_summary', class_summarize_movement),
+
+    # Survey Requests
+    path('survey/select', survey_get_by_class)
 ]
