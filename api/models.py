@@ -182,9 +182,12 @@ class SurveyQuestion(models.Model):
 
 class SurveyResponse(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    surveyQuestion = models.ForeignKey(SurveyQuestion, on_delete=None)
+    survey_question = models.ForeignKey(SurveyQuestion, on_delete=None)
     student = models.ForeignKey(Student, on_delete=None)
     response = models.TextField()
 
     def __str__(self):
-        return self.surveyQuestion.prompt_text + " | " + str(self.student.id)
+        return self.survey_question.prompt_text + " | " + str(self.student.id)
+
+    def to_dict(self):
+        return {'id': str(self.id), 'question': str(self.survey_question.id), 'student': str(self.student.id), 'response': self.response}
