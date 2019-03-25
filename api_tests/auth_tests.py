@@ -1,9 +1,9 @@
-from api.auth_views import login, register, logout, request_password_reset
+from api.auth_views import login, register, logout, request_password_reset, reset_password
 from api.models import Student, Session
 
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 
 rf = RequestFactory()
 
@@ -172,9 +172,87 @@ class RequestPasswordResetTests(TestCase):
         })
         register(register_request)
 
-        self.request_password_reset_request = rf.get('/api/auth/request_password_reset/test_user')
+        self.request_password_reset_request = rf.get('/api/auth/request_password_reset/')
 
     def test_success_status(self):
-        response = request_password_reset(self.request_password_reset_request)
+        response = request_password_reset(self.request_password_reset_request, 'test_user')
 
-        self.assertTrue('"status": "success"' in response.content.decode('utf-u'))
+        self.assertTrue('"status": "success"' in response.content.decode('utf-8'))
+
+    def test_has_reset_code(self):
+        request_password_reset(self.request_password_reset_request, 'test_user')
+        test_user = User.objects.get(username='test_user')
+
+        self.assertIsNotNone(Student.objects.get(user=test_user).reset_password_code)
+
+    def test_wrong_request_type(self):
+        response = request_password_reset(rf.post('/api/auth/request_password_reset/'), 'test_user')
+
+        self.assertTrue('"error_id": 101' in response.content.decode('utf-8'))
+
+    def test_bad_username(self):
+        response = request_password_reset(self.request_password_reset_request, 'test_user2')
+
+        self.assertTrue('"error_id": 104' in response.content.decode('utf-8'))
+
+    def test_reset_code_already_exists(self):
+        request_password_reset(self.request_password_reset_request, 'test_user')
+        response = request_password_reset(self.request_password_reset_request, 'test_user')
+
+        self.assertTrue('"error_id": 107' in response.content.decode('utf-8'))
+
+
+class ResetPasswordTests(TestCase):
+
+    def setUp(self):
+        register_request = rf.post('api/auth/register', {
+            'username': 'test_user', 'password': 'test_password1234', 'email': 'test@test.com', 'first_name': 'test',
+            'last_name': 'test'
+        })
+        register(register_request)
+        request_password_reset_request = rf.get('/api/auth/request_password_reset/')
+        request_password_reset(request_password_reset_request, 'test_user')
+
+        self.reset_code = Student.objects.get(user=User.objects.get(username='test_user')).reset_password_code
+        self.password_reset_request = rf.post('/api/auth/reset_password/', {
+            'new_password': 'new_test_password1234'
+        })
+
+    def test_success_status(self):
+        response = reset_password(self.password_reset_request, self.reset_code)
+
+        self.assertTrue('"status": "success"' in response.content.decode('utf-8'))
+
+    def test_password_changed(self):
+        reset_password(self.password_reset_request, self.reset_code)
+        test_user = User.objects.get(username='test_user')
+
+        self.assertTrue(test_user.check_password('new_test_password1234'))
+
+    def test_wrong_request_type(self):
+        request = rf.get('/api/auth/reset_password/', {'new_password': 'new_test_password1234'})
+        response = reset_password(request, self.reset_code)
+
+        self.assertTrue('"error_id": 101' in response.content.decode('utf-8'))
+
+    def test_not_enough_POST_data(self):
+        request = rf.post('/api/auth/reset_password/')
+        response = reset_password(request, self.reset_code)
+
+        self.assertTrue('"error_id": 103' in response.content.decode('utf-8'))
+
+    def test_bad_reset_code(self):
+        response = reset_password(self.password_reset_request, '123456')
+
+        self.assertTrue('"error_id": 108' in response.content.decode('utf-8'))
+
+    def test_no_reset_code(self):
+        test_student = Student.objects.get(user=User.objects.get(username='test_user'))
+        test_student.reset_password_code = None
+        test_student.save()
+
+        response = reset_password(self.password_reset_request, self.reset_code)
+
+        self.assertTrue('"error_id": 108' in response.content.decode('utf-8'))
+
+

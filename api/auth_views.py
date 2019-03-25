@@ -301,12 +301,16 @@ def request_password_reset(request, username):
             username -- The username provided to request the password reset for
 
         Possible Error Codes:
-            104, 107
+            101, 104, 107
 
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level.
     """
+    # Ensure the API call is using GET method
+    if request.method != "GET":
+        return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
+
     # Lookup the user with the provided username
     user_lookup = User.objects.filter(username=username)
 
@@ -362,18 +366,6 @@ def reset_password(request, reset_code):
             Type: JSON
             Data: A JSON object with a 'status' at the top level.
     """
-    # Check that the reset code is registered to a user
-    student_lookup = Student.objects.filter(reset_password_code=reset_code)
-
-    if len(student_lookup) == 0:
-        return JsonResponse(Response.get_error_status(108, AUTH_ERRORS))
-
-    student_account = student_lookup[0]
-
-    # Check that the reset code sent by the user is correct
-    if student_account.reset_password_code != reset_code:
-        return JsonResponse(Response.get_error_status(108, AUTH_ERRORS))
-
     # Check that the request was made using POST
     if request.method != "POST":
         return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
@@ -382,8 +374,16 @@ def reset_password(request, reset_code):
     if 'new_password' not in request.POST:
         return JsonResponse(Response.get_error_status(103, AUTH_ERRORS))
 
+    # Check that the reset code is registered to a user
+    student_lookup = Student.objects.filter(reset_password_code=reset_code)
+
+    if len(student_lookup) == 0:
+        return JsonResponse(Response.get_error_status(108, AUTH_ERRORS))
+
+    student_account = student_lookup[0]
+
     # Change the user's password
-    new_password = request.POST
+    new_password = request.POST['new_password']
     student_account.reset_password_code = None
     student_account.user.set_password(new_password)
     student_account.user.save()
