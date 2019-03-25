@@ -120,6 +120,7 @@ def login(request):
         Function Summary: This function will login a user and return a session_id to use to authenticate into the API.
         Path: '/api/auth/login'
         Request Type: POST
+        Required Login: False
 
         Args:
             request -- The request made to the server by the client
@@ -174,6 +175,7 @@ def register(request):
         Function Summary: This function is used to create a new User and Student.
         Path: '/api/auth/register'
         Request Type: POST
+        Required Login: False
 
         Args:
             request -- The request made to the server from the client
@@ -236,6 +238,7 @@ def logout(request):
         Function Summary: This function is used to logout a User and remove their session_id if it exists.
         Path: '/api/auth/logout'
         Request Type: GET
+        Required Login: True
 
         Args:
             request -- The request made to the server from the client
@@ -270,6 +273,7 @@ def request_password_reset(request, username):
         Function Summary: This function is used to request a password reset for a User. The user will receive an email containing a reset code if successful. This is only to be used for resetting Student passwords. The reset code is only active for one hour.
         Path: '/api/auth/request_password_reset/<USERNAME>'
         Request Type: GET
+        Required Login: False
 
         Args:
             request -- The request made to the server by the client
@@ -318,6 +322,7 @@ def reset_password(request, reset_code):
         Function Summary: This function is used to reset a password. The function requires a new password in the POST parameters and the proper reset code to reset the password. The user will receive an email notification that their password has been changed.
         Path: '/api/auth/reset_password/<RESET CODE>'
         Request Type: POST
+        Required Login: False
 
         Args:
             request -- The request made to the server by the client
