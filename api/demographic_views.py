@@ -103,13 +103,16 @@ def demographic_update(request):
         Args:
             request -- the HTTP request made to the url
 
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+
         Optional Request Parameters:
-            age -- the age of the user
-            gender -- the gender of the user
-            grade_year -- the grade year of the user
-            ethnicity -- the ethnicity of the user
-            race -- the race of the user
-            major -- the major of the user
+            age -- The age of the user
+            gender -- The gender of the user
+            grade_year -- The grade year of the user
+            ethnicity -- The ethnicity of the user
+            race -- The race of the user
+            major -- The major of the user
 
         Possible Error Codes:
             200, 201, 205, 206
@@ -190,6 +193,9 @@ def demographic_delete(request):
         Args:
             request -- The request made to the server by the client
 
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+
         Possible Error Codes:
             200, 201, 206
 
@@ -229,6 +235,9 @@ def demographic_select(request):
 
         Args:
             request -- The request made to the server by the client
+
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
 
         Possible Error Codes:
             200, 206

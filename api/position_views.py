@@ -21,28 +21,38 @@ POSITION_ERRORS = {
 @csrf_exempt
 def position_create(request):
     """
-        This function is used to update or create a new demographic object.
+        Function Summary: This function is used to create a Position object.
         Path: 'api/position/create'
         Request Type: GET
+        Required Login: True
 
         Args:
-            request -- the HTTP request made to the url
+            request -- The request made to the server by the client
 
-        Required Request Parameters:
-            x -- the x position of the user
-            y -- the y position of the user
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+            x -- The x position of the user
+            y -- The y position of the user
+
+        Possible Error Codes:
+            300, 301, 302
 
         Return:
-            JSON object -- a json object with either a completed or error status
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
+    # Ensure the API call is using a GET request.
     if request.method != "GET":
         return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
+    # Ensure that the user is logged in.
     if not get_user_logged_in(request):
         return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
+    # Get the currently logged in Student object.
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    # Try to create a new Position object and return a success status.
     try:
         x = request.GET['x']
         y = request.GET['y']
@@ -61,28 +71,39 @@ def position_create(request):
 @csrf_exempt
 def position_select_all(request):
     """
-        This function is used to get all of the positions for the logged in user.
-        Path: 'api/position/select/all'
+        Function Summary: This function is used to get all of the Positions objects for a Student.
+        Path: 'api/position/all'
         Request Type: GET
+        Required Login: True
 
         Args:
-            request -- the HTTP request made to the url
+            request -- The request made to the server by the client
+
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+
+        Possible Error Codes:
+            300, 301
 
         Return:
-            JSON object -- a json object with either a completed or error status
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
+    # Ensure the API call is using a GET request.
     if request.method != "GET":
         return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
+    # Ensure the user is logged in.
     if not get_user_logged_in(request):
         return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
+    # Get the currently logged in Student object.
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
-    positions = []
-    for pos in Position.objects.filter(student=current_student):
-        positions.append(pos.to_dict())
+    # Get all of the dictionary objects of the Position objects for the current Student.
+    positions = [x.to_dict for x in Position.objects.filter(student=current_student)]
 
+    # Return the success status with the Position objects.
     success_status = Response.get_success_status()
     success_status['data'] = positions
 
@@ -92,54 +113,102 @@ def position_select_all(request):
 @csrf_exempt
 def position_select_id(request):
     """
-        This function is used to get an individual position using the id.
+        Function Summary: This function is used to get a single Position object's information.
         Path: 'api/position/select'
         Request Type: GET
+        Required Login: True
 
         Args:
-            request -- the HTTP request made to the url
+            request -- The request made to the server by the client
 
-        Required Request Parameters:
-            id -- the id of the position object
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+            position_id -- The Position ID to be looked up
+
+        Possible Error Codes:
+            300, 301, 302, 304
 
         Return:
-            JSON object -- a json object with either a completed or error status
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
+    # Ensure the API call is using a GET request.
     if request.method != "GET":
         return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
+    # Ensure the user is logged in.
     if not get_user_logged_in(request):
         return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
+    # Get the currently logged in Student object.
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
-    try:
-        pos = Position.objects.get(id=request.GET['id'])
-        if pos.student != current_student:
-            return JsonResponse(Response.get_error_status(304, POSITION_ERRORS))
-        return JsonResponse({'position': {'id': pos.id, 'x': pos.x, 'y': pos.y, 'time': pos.timestamp}})
-
-    except KeyError:
+    # Ensure that the request's GET parameters include 'position_id'.
+    if 'position_id' not in request.GET:
         return JsonResponse(Response.get_error_status(302, POSITION_ERRORS))
+
+    # Lookup the Position using the provided 'position_id'.
+    position_lookup = Position.objects.filter(id=request.GET['position_id'])
+
+    # If no Position object exists, return an error status.
+    if len(position_lookup) == 0:
+        return JsonResponse(Response.get_error_status(303, POSITION_ERRORS))
+
+    # Get the current Position.
+    current_position = position_lookup[0]
+
+    # If the logged in User is not the User listed in the Position, return an error status
+    if current_position.student != current_student:
+        return JsonResponse(Response.get_error_status(304, POSITION_ERRORS))
+
+    # Return a success status with the Position data.
+    success_status = Response.get_success_status()
+    success_status['data'] = current_position.to_dict()
+    return JsonResponse(success_status)
 
 
 @csrf_exempt
 def position_summary(request):
+    """
+        Function Summary: This function is used to get the Position history of a User.
+        Path: 'api/position/summary'
+        Request Type: GET
+        Required Login: True
+
+        Args:
+            request -- The request made to the server by the client
+
+        Required GET Parameters:
+            session_id -- The Session ID of the logged in user
+            start_time -- The start time to search for
+            end_time -- The end time to search for
+
+        Possible Error Codes:
+            300, 301, 302, 305, 306
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
+    """
+    # Ensure the API call is using a GET request.
     if request.method != "GET":
         return JsonResponse(Response.get_error_status(301, POSITION_ERRORS))
 
+    # Ensure the user is logged in.
     if not get_user_logged_in(request):
         return JsonResponse(Response.get_error_status(300, POSITION_ERRORS))
 
-    current_user = get_user_by_session(request.GET['session_id'])
-    current_student = Student.objects.get(user=current_user)
+    # Get the currently logged in Student object.
+    current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
-    if 'start' not in request.GET or 'end' not in request.GET:
+    # Ensure that 'start_time' and 'end_time' are in the GET parameters.
+    if 'start_time' not in request.GET or 'end_time' not in request.GET:
         return JsonResponse(Response.get_error_status(302, POSITION_ERRORS))
 
+    # Try to parse the start and end times into DateTime objects. Return error status if the string is invalid.
     try:
-        start_datetime = parse_datetime(request.GET['start'])
-        end_datetime = parse_datetime(request.GET['end'])
+        start_datetime = parse_datetime(request.GET['start_time'])
+        end_datetime = parse_datetime(request.GET['end_time'])
 
     except ValueError:
         return JsonResponse(Response.get_error_status(305, POSITION_ERRORS))
@@ -147,11 +216,12 @@ def position_summary(request):
     if start_datetime is None or end_datetime is None:
         return JsonResponse(Response.get_error_status(306, POSITION_ERRORS))
 
+    # Convert start and end times into local time
     start_datetime = timezone.localtime(timezone.make_aware(start_datetime))
     end_datetime = timezone.localtime(timezone.make_aware(end_datetime))
 
-    positions = Position.objects.filter(student=current_student, timestamp__gt=start_datetime, timestamp__lt=end_datetime).order_by('timestamp')
+    # Return a success status with the position summary information.
     success_object = Response.get_success_status()
-    success_object['data'] = [x.to_dict() for x in positions]
+    success_object['data'] = [x.to_dict() for x in Position.objects.filter(student=current_student, timestamp__gt=start_datetime, timestamp__lt=end_datetime).order_by('timestamp')]
 
     return JsonResponse(success_object)
