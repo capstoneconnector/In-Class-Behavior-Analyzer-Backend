@@ -43,11 +43,11 @@
 
     Required GET Parameters:
         
-    Required POST parameters:
+    Required POST Parameters:
     
-    Optional GET parameters:
+    Optional GET Parameters:
     
-    Optional POST parameters:
+    Optional POST Parameters:
     
     Possible Error Codes:
 
