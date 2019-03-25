@@ -24,6 +24,18 @@ class UserLoginTests(TestCase):
         self.assertTrue('"session_id"' in response.content.decode('utf-8'))
         self.assertTrue('"status": "success"' in response.content.decode('utf-8'))
 
+    def test_session_already_exists(self):
+        mock_request = rf.post('api/login/', {
+            'username': 'test_user', 'password': 'test_password1234'
+        })
+        first_response = login(mock_request)
+        second_response = login(mock_request)
+
+        first_session_id = first_response.content.decode('utf-8').split('"session_id": "')[1].split('"')[0]
+        second_session_id = second_response.content.decode('utf-8').split('"session_id": "')[1].split('"')[0]
+
+        self.assertTrue(first_session_id == second_session_id)
+
     def test_wrong_request_type(self):
         mock_request = rf.get('api/login/', {
             'username': 'test_user', 'password': 'test_password1234'
@@ -47,6 +59,14 @@ class UserLoginTests(TestCase):
         response = login(mock_request)
 
         self.assertTrue('"error_id": 104' in response.content.decode('utf-8'))
+
+    def test_wrong_password(self):
+        mock_request = rf.post('api/login/', {
+            'username': 'test_user', 'password': 'test_password12341'
+        })
+        response = login(mock_request)
+
+        self.assertTrue('"error_id": 105' in response.content.decode('utf-8'))
 
 
 class UserRegisterTests(TestCase):
@@ -147,6 +167,13 @@ class UserLogoutTests(TestCase):
 
         user_sessions = Session.objects.filter(user=User.objects.get(username='test_user'))
         self.assertTrue(len(user_sessions) == 0)
+
+    def test_user_already_logged_out(self):
+        test_session = Session.objects.get(user=User.objects.get(username='test_user'))
+        test_session.delete()
+
+        response = logout(self.logout_request)
+        self.assertTrue('"status": "success"' in response.content.decode('utf-8'))
 
     def test_wrong_request_method(self):
         mock_request = rf.post('/api/logout', {
