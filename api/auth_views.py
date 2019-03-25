@@ -1,11 +1,12 @@
 from .models import Student, Session
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.contrib.auth.password_validation import validate_password, ValidationError
 
 import random
 import string
@@ -26,7 +27,8 @@ AUTH_ERRORS = {
     107: 'User already has a reset code',
     108: 'Bad reset code',
     109: 'No user logged in',
-    110: 'No group associated with current user'
+    110: 'No group associated with current user',
+    111: 'Not strong enough password'
 }
 
 
@@ -129,6 +131,9 @@ def login(request):
             username -- The username for the user
             password -- The password for the user
 
+        Possible Error Codes:
+            101, 103, 104, 105
+
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level. If successful, it will have a data object containing the 'session_id' for authentication
@@ -187,6 +192,9 @@ def register(request):
             first_name -- The first name on the new account
             last_name -- The last name on the new account
 
+        Possible Error Codes:
+            101, 103, 106
+
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level.
@@ -211,8 +219,14 @@ def register(request):
                                    email=request.POST['email'],
                                    first_name=request.POST['first_name'],
                                    last_name=request.POST['last_name'])
+
+    # Validate that the password provided is strong enough
+    try:
+        validate_password(request.POST['password'])
+    except ValidationError:
+        return JsonResponse(Response.get_error_status(111, AUTH_ERRORS))
+
     new_user.set_password(request.POST['password'])
-    new_user.groups.add(Group.objects.get(name='Students'))
     new_user.save()
 
     # Create student object
@@ -246,10 +260,17 @@ def logout(request):
         Required GET parameters:
             session_id -- The Session ID of the User to be logged out
 
+        Possible Error Codes:
+            100, 101
+
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level.
     """
+    # Make sure the request is using POST to pass data
+    if request.method != "GET":
+        return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
+
     # Ensure that the 'session_id' exists in the GET parameters
     if 'session_id' not in request.GET:
         return JsonResponse(Response.get_error_status(100, AUTH_ERRORS))
@@ -278,6 +299,9 @@ def request_password_reset(request, username):
         Args:
             request -- The request made to the server by the client
             username -- The username provided to request the password reset for
+
+        Possible Error Codes:
+            104, 107
 
         Return:
             Type: JSON
@@ -330,6 +354,9 @@ def reset_password(request, reset_code):
 
         Required POST parameters:
             new_password -- The new password for the User
+
+        Possible Error Codes:
+            101, 103, 108
 
         Return:
             Type: JSON
