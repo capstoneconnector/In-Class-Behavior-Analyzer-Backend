@@ -16,7 +16,6 @@ urlpatterns = [
     path('auth/logout', logout),
     path('auth/reset_password/<str:reset_code>', reset_password),
     path('auth/request_password_reset/<str:username>', request_password_reset),
-    path('user/group', user_group),
 
     # Demographic Requests
     path('demographic/create', demographic_create),

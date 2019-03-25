@@ -31,6 +31,16 @@ AUTH_ERRORS = {
 
 
 def get_user_logged_in(request):
+    """
+        Function Summary: This will get whether a user is logged in or not.
+
+        Args:
+            request -- The request object containing the 'session_id' in GET parameters
+
+        Return:
+            Type: boolean
+            Data: If the 'session_id' is not in GET or the Session object does not exist, False will be returned. Otherwise, true will be returned
+    """
     if 'session_id' in request.GET:
         session_id = request.GET['session_id']
     else:
@@ -45,14 +55,43 @@ def get_user_logged_in(request):
 
 
 def get_user_by_session(session_id):
+    """
+        Function Summary: This will get the user by the 'session_id' provided. This should be run after 'get_user_logged_in()' to ensure that no errors are thrown.
+
+        Args:
+            session_id -- The session_id to get the user by
+
+        Return:
+            Type: User
+            Data: The User object that is connected to the 'session_id'
+        """
     return Session.objects.get(id=session_id).user
 
 
 def is_user_session_valid(session_id):
+    """
+        Function Summary: This will check whether a 'session_id' is valid or not.
+
+        Args:
+            session_id -- The Session ID to be checked for validity
+
+        Return:
+            Type: boolean
+            Data: Will return False if the ID does not exist and True otherwise
+    """
     return len(Session.objects.filter(id=session_id)) == 1
 
 
 def generate_reset_code():
+    """
+        Function Summary: This function will generate a random six-digit reset code for use in the password reset function. The string will contain only uppercase letters and digits.
+
+        Args:
+
+        Return:
+            Type: string
+            Data: A random six-digit string
+    """
     reset_code = ''
     for i in range(6):
         reset_code += random.choice(string.ascii_uppercase + string.digits)
@@ -61,6 +100,15 @@ def generate_reset_code():
 
 @task()
 def expire_reset_code(student_id):
+    """
+        Function Summary: This function is a task that will remove the reset code on a Student object. This is used by the Django-Workers library to expire the reset code after an hour.
+
+        Args:
+            student_id -- The ID of the Student object
+
+        Return:
+            Type: None
+    """
     student = Student.objects.get(id=student_id)
     student.reset_password_code = ''
     student.save()
@@ -68,6 +116,22 @@ def expire_reset_code(student_id):
 
 @csrf_exempt
 def login(request):
+    """
+        Function Summary: This function will login a user and return a session_id to use to authenticate into the API.
+        Path: '/api/auth/login'
+        Request Type: POST
+
+        Args:
+            request -- The request made to the server by the client
+
+        Required POST parameters:
+            username -- The username for the user
+            password -- The password for the user
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level. If successful, it will have a data object containing the 'session_id' for authentication
+    """
     # Make sure the request is using POST to pass data
     if request.method != "POST":
         return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
@@ -106,6 +170,25 @@ def login(request):
 
 @csrf_exempt
 def register(request):
+    """
+        Function Summary: This function is used to create a new User and Student.
+        Path: '/api/auth/register'
+        Request Type: POST
+
+        Args:
+            request -- The request made to the server from the client
+
+        Required POST parameters:
+            username -- The username to be created
+            password -- The password to be created. This will be hashed by the server
+            email -- The email associated with the new account
+            first_name -- The first name on the new account
+            last_name -- The last name on the new account
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level.
+    """
     # Make sure the request is using POST to pass data
     if request.method != "POST":
         return JsonResponse(Response.get_error_status(101, AUTH_ERRORS))
@@ -149,14 +232,33 @@ def register(request):
 
 @csrf_exempt
 def logout(request):
+    """
+        Function Summary: This function is used to logout a User and remove their session_id if it exists.
+        Path: '/api/auth/logout'
+        Request Type: GET
+
+        Args:
+            request -- The request made to the server from the client
+
+        Required GET parameters:
+            session_id -- The Session ID of the User to be logged out
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level.
+    """
+    # Ensure that the 'session_id' exists in the GET parameters
     if 'session_id' not in request.GET:
         return JsonResponse(Response.get_error_status(100, AUTH_ERRORS))
 
+    # Lookup Session objects using the 'session_id' provided
     session_lookup = Session.objects.filter(id=request.GET['session_id'])
 
+    # Return error if there are no Session objects with the provided 'session_id'
     if len(session_lookup) == 0:
         return JsonResponse(Response.get_success_status())
 
+    # Delete the Session object and return a success
     current_session = session_lookup[0]
     current_session.delete()
     return JsonResponse(Response.get_success_status())
@@ -164,6 +266,19 @@ def logout(request):
 
 @csrf_exempt
 def request_password_reset(request, username):
+    """
+        Function Summary: This function is used to request a password reset for a User. The user will receive an email containing a reset code if successful. This is only to be used for resetting Student passwords. The reset code is only active for one hour.
+        Path: '/api/auth/request_password_reset/<USERNAME>'
+        Request Type: GET
+
+        Args:
+            request -- The request made to the server by the client
+            username -- The username provided to request the password reset for
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level.
+    """
     # Lookup the user with the provided username
     user_lookup = User.objects.filter(username=username)
 
@@ -199,7 +314,22 @@ def request_password_reset(request, username):
 
 @csrf_exempt
 def reset_password(request, reset_code):
+    """
+        Function Summary: This function is used to reset a password. The function requires a new password in the POST parameters and the proper reset code to reset the password. The user will receive an email notification that their password has been changed.
+        Path: '/api/auth/reset_password/<RESET CODE>'
+        Request Type: POST
 
+        Args:
+            request -- The request made to the server by the client
+            reset_code -- The reset code emailed to the user
+
+        Required POST parameters:
+            new_password -- The new password for the User
+
+        Return:
+            Type: JSON
+            Data: A JSON object with a 'status' at the top level.
+    """
     # Check that the reset code is registered to a user
     student_lookup = Student.objects.filter(reset_password_code=reset_code)
 
@@ -237,39 +367,3 @@ def reset_password(request, reset_code):
     email.send()
 
     return JsonResponse(Response.get_success_status())
-
-
-@csrf_exempt
-def user_group(request):
-    """
-        This function is used to check the logged in users role.
-        Path: api/user/group
-        Request Type: GET
-
-        Args:
-            return -- the HTTP request made to the url
-
-        Return:
-            JSON object -- a json object with either a group object
-    """
-    is_user_logged_in = get_user_logged_in(request)
-
-    if not is_user_logged_in:
-        return JsonResponse(Response.get_error_status(109, AUTH_ERRORS))
-
-    session_id = request.GET['session_id']
-
-    current_user = get_user_by_session(session_id)
-
-    if current_user.groups.filter(name="Professors").exists():
-        group = "professor"
-    elif current_user.groups.filter(name="Administrators").exists():
-        group = "administrator"
-    elif current_user.groups.filter(name="Students").exists():
-        group = "student"
-    else:
-        return JsonResponse(Response.get_error_status(110, AUTH_ERRORS))
-
-    success_object = Response.get_success_status()
-    success_object['data'] = {'group': group}
-    return JsonResponse(success_object)
