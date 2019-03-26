@@ -203,3 +203,14 @@ class SurveyResponse(models.Model):
 
     def to_dict(self):
         return {'id': str(self.id), 'question': str(self.survey_question.id), 'student': str(self.student.id), 'response': self.response}
+
+
+class Feedback(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    feedback = models.TextField()
+
+    def __str__(self):
+        return str(self.id)
+
+    def to_dict(self):
+        return {'id': str(self.id), 'feedback': self.feedback}
