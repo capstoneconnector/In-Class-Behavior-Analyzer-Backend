@@ -22,7 +22,7 @@ CLASS_ERRORS = {
 @csrf_exempt
 def class_select_all(request):
     """
-        Function Summary: This function is used to get all the Class objects of a Student
+        Function Summary: This function is used to get all the Class objects of a Student.
         Path: '/api/class/select/all'
         Request Type: GET
         Required Login: True
