@@ -6,6 +6,7 @@ from .demographic_views import *
 from .position_views import *
 from .class_views import *
 from .survey_views import *
+from .feedback_views import *
 
 urlpatterns = [
     path('', index),
@@ -30,7 +31,6 @@ urlpatterns = [
     path('position/select', position_select_id),
     path('position/summary', position_summary),
 
-
     # Class Requests
     path('class/select/all', class_select_all),
     path('class/movement_summary', class_summarize_movement),
@@ -38,4 +38,7 @@ urlpatterns = [
     # Survey Requests
     path('survey/select', survey_get_by_class),
     path('survey/respond', survey_response_add),
+
+    # Feedback Requests
+    path('feedback/submit', feedback_create)
 ]
