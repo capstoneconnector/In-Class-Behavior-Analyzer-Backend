@@ -37,6 +37,9 @@ class GenderLookup(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name}
+
 
 class GradeYearLookup(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,6 +47,9 @@ class GradeYearLookup(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name}
 
 
 class RaceLookup(models.Model):
@@ -53,6 +59,9 @@ class RaceLookup(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name}
+
 
 class EthnicityLookup(models.Model):
     id = models.AutoField(primary_key=True)
@@ -60,6 +69,9 @@ class EthnicityLookup(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name}
 
 
 class Demographic(models.Model):

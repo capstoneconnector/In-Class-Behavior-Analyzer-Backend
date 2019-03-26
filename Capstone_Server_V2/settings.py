@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'workers',
-    'django.contrib.admindocs'
+    'django.contrib.admindocs',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [

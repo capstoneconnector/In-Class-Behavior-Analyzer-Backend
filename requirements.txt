@@ -2,3 +2,4 @@ docutils
 pip
 django==2.1.5
 django-workers==0.1.2
+django-extensions==2.1.6

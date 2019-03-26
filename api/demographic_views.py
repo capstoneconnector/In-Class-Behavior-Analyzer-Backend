@@ -46,13 +46,13 @@ def demographic_create(request):
             Type: JSON
             Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
-    # If the user is not logged in, return an error status
-    if not get_user_logged_in(request):
-        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
-
     # Ensure the request is using POST
     if request.method != "POST":
         return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
+
+    # If the user is not logged in, return an error status
+    if not get_user_logged_in(request):
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     # Get the logged in Student
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
@@ -121,13 +121,13 @@ def demographic_update(request):
             Type: JSON
             Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
-    # Ensure the user is logged in. Return an error status if the user is not logged in.
-    if not get_user_logged_in(request):
-        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
-
     # Ensure the API call is using POST
     if request.method != "POST":
         return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
+
+    # Ensure the user is logged in. Return an error status if the user is not logged in.
+    if not get_user_logged_in(request):
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
     # Get the logged in Student object
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
@@ -203,16 +203,16 @@ def demographic_delete(request):
             Type: JSON
             Data: A JSON object with a 'status' at the top level.
     """
-    # Ensure that the user is logged in
-    if not get_user_logged_in(request):
-        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
-
     # Ensure the API call is using GET
     if request.method != "GET":
         return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
 
+    # Ensure that the user is logged in
+    if not get_user_logged_in(request):
+        return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
+
     # Get the Student object
-    current_student = get_user_by_session(request.GET['session_id'])
+    current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     # Try to delete the Demographic object associated with the logged in Student object.
     try:
@@ -240,19 +240,24 @@ def demographic_select(request):
             session_id -- The Session ID of the logged in user
 
         Possible Error Codes:
-            200, 206
+            200, 201, 206
 
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
-    is_user_logged_in = get_user_logged_in(request)
+    # Ensure the API call is using GET request.
+    if request.method != "GET":
+        return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
 
-    if not is_user_logged_in:
+    # Ensure the user is logged in.
+    if not get_user_logged_in(request):
         return JsonResponse(Response.get_error_status(200, DEMO_ERRORS))
 
+    # Get the currently logged in Student object.
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    # Get the Demographic object associated with the Student and return it.
     try:
         demo_instance = Demographic.objects.get(student=current_student)
         object_dict = demo_instance.to_dict()
@@ -260,6 +265,7 @@ def demographic_select(request):
         success_object['data'] = object_dict
         return JsonResponse(success_object)
 
+    # Return error status if the Demographic object does not exist for the Student.
     except Demographic.DoesNotExist:
         return JsonResponse(Response.get_error_status(206, DEMO_ERRORS))
 
@@ -275,24 +281,36 @@ def demographic_form(request):
         Args:
             request -- The request made to the server by the client
 
+        Possible Error Codes:
+            201
+
         Return:
             Type: JSON
             Data: A JSON object with a 'status' at the top level. Will contain a "data" JSON object.
     """
+    # Ensure the API call is using GET request
+    if request.method != "GET":
+        return JsonResponse(Response.get_error_status(201, DEMO_ERRORS))
+
     form_values = {}
 
+    # Get all the GenderLookup objects.
     genders = GenderLookup.objects.all()
-    form_values['genders'] = [{'id': g.id, 'name': g.name} for g in genders]
+    form_values['genders'] = [g.to_dict() for g in genders]
 
+    # Get all the GradeYearLookup objects.
     grade_years = GradeYearLookup.objects.all()
-    form_values['grade_years'] = [{'id': g.id, 'name': g.name} for g in grade_years]
+    form_values['grade_years'] = [g.to_dict() for g in grade_years]
 
+    # Get all the EthnicityLookup objects.
     ethnicities = EthnicityLookup.objects.all()
-    form_values['ethnicities'] = [{'id': e.id, 'name': e.name} for e in ethnicities]
+    form_values['ethnicities'] = [e.to_dict() for e in ethnicities]
 
+    # Get all the RaceLookup objects.
     races = RaceLookup.objects.all()
-    form_values['races'] = [{'id': r.id, 'name': r.name} for r in races]
+    form_values['races'] = [r.to_dict() for r in races]
 
+    # Return all of the values and success status
     success_status = Response.get_success_status()
     success_status['data'] = form_values
     return JsonResponse(success_status)
