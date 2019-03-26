@@ -57,7 +57,7 @@ def position_create(request):
         x = request.GET['x']
         y = request.GET['y']
         time = timezone.localtime(timezone.now())
-        new_position = Position.objects.create(id=uuid.uuid4(), student=current_student, x=x, y=y, timestamp=time)
+        new_position = Position.objects.create(student=current_student, x=x, y=y, timestamp=time)
         new_position.save()
 
         success_status = Response.get_success_status()
@@ -101,13 +101,13 @@ def position_select_all(request):
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     # Get all of the dictionary objects of the Position objects for the current Student.
-    positions = [x.to_dict for x in Position.objects.filter(student=current_student)]
+    positions = [x.to_dict() for x in Position.objects.filter(student=current_student)]
 
     # Return the success status with the Position objects.
     success_status = Response.get_success_status()
     success_status['data'] = positions
 
-    return JsonResponse(Response.get_success_status())
+    return JsonResponse(success_status)
 
 
 @csrf_exempt
@@ -126,7 +126,7 @@ def position_select_id(request):
             position_id -- The Position ID to be looked up
 
         Possible Error Codes:
-            300, 301, 302, 304
+            300, 301, 302, 303, 304
 
         Return:
             Type: JSON
