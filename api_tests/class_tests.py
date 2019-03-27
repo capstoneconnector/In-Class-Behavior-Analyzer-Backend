@@ -116,7 +116,7 @@ class ClassSummerizeMovement(TestCase):
         )
 
         for i in range(len(days)):
-            self.new_class.days_of_the_week.add(DayLookup.objects.get(id=1))
+            self.new_class.days_of_the_week.add(DayLookup.objects.get(id=i))
 
         self.new_class.save()
 
@@ -139,9 +139,7 @@ class ClassSummerizeMovement(TestCase):
         response = class_summarize_movement(self.request)
         json_obj = json.loads(response.content.decode('utf-8'))
 
-        print(json_obj)
-
-        self.assertEqual(1, len(json_obj['data']))
+        self.assertEqual(3, len(json_obj['data']))
 
         today_date = datetime.date.today().strftime('%Y-%m-%d')
         self.assertEqual(1, len(json_obj['data'][today_date]))
@@ -179,7 +177,7 @@ class ClassSummerizeMovement(TestCase):
 
     def test_class_does_not_exist(self):
         mock_request = rf.post('/api/class/movement_summary?session_id=' + str(self.session_id), {
-            'class': '0314864b-1f77-4356-a2f6-d9dfe933ae09',
+            'class': 111,
             'start_date': (datetime.date.today() - datetime.timedelta(days=1)).strftime('%m/%d/%Y'),
             'end_date': (datetime.date.today() + datetime.timedelta(days=1)).strftime('%m/%d/%Y')
         })

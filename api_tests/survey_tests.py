@@ -98,7 +98,7 @@ class SurveySelectByClassTests(TestCase):
 
     def test_bad_class_lookup(self):
         mock_request = rf.post('/api/survey/select?session_id=' + str(self.session_id), {
-            'class': '28c604a8-0518-4a89-afd7-3028f01d0f12'
+            'class': 111
         })
         response = survey_get_by_class(mock_request)
 
@@ -158,8 +158,7 @@ class SurveyResponseAddTests(TestCase):
         self.request = rf.post('/api/survey/select?session_id=' + str(self.session_id), {
             'survey': str(self.new_survey.id),
             str(self.new_survey_question.id): 'Test Response',
-            'Bad+UUID': 'Test Bad UUID',
-            '28c604a8-0518-4a89-afd7-3028f01d0f12': 'Test Question Does Not Exist'
+            '15': 'Test Question Does Not Exist'
         })
 
     def test_success_status(self):
@@ -172,8 +171,7 @@ class SurveyResponseAddTests(TestCase):
         response = survey_response_add(self.request)
         json_obj = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual('Bad UUID', json_obj['data']['Bad+UUID'])
-        self.assertEqual('Question does not exist', json_obj['data']['28c604a8-0518-4a89-afd7-3028f01d0f12'])
+        self.assertEqual('Question does not exist', json_obj['data']['15'])
         self.assertEqual('Test Response', json_obj['data'][str(self.new_survey_question.id)]['response'])
 
         survey_responses = SurveyResponse.objects.filter(student=self.new_student)
@@ -213,7 +211,7 @@ class SurveyResponseAddTests(TestCase):
 
     def test_survey_does_not_exist(self):
         mock_request = rf.post('/api/survey/select?session_id=' + str(self.session_id), {
-            'survey': '28c604a8-0518-4a89-afd7-3028f01d0f12',
+            'survey': 111,
             str(self.new_survey_question.id): 'Test Response',
             'Bad+UUID': 'Test Bad UUID',
             '28c604a8-0518-4a89-afd7-3028f01d0f12': 'Test Question Does Not Exist'

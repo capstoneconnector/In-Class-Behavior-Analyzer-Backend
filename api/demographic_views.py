@@ -228,7 +228,7 @@ def demographic_delete(request):
 @csrf_exempt
 def demographic_select(request):
     """
-        Function Summary": This function is used to get a Student's Demographic information
+        Function Summary: This function is used to get a Student's Demographic information
         Path: 'api/demographic/select'
         Request Type: GET
         Required Login: True

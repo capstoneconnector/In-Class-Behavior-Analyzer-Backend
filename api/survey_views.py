@@ -140,13 +140,6 @@ def survey_response_add(request):
 
     # Parse all the POST data.
     for question_id, question_response in post_data.items():
-        # Ensure the Question ID in POST data is a valid UUID.
-        try:
-            uuid.UUID(question_id)
-        except ValueError:
-            results[question_id] = 'Bad UUID'
-            continue
-
         # Lookup SurveyQuestion object by ID.
         question_lookup = SurveyQuestion.objects.filter(id=question_id)
 

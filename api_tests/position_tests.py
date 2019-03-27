@@ -89,10 +89,10 @@ class PositionSelectAllTests(TestCase):
         new_session.save()
         self.session_id = new_session.id
 
-        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now(), id=uuid.uuid4())
+        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now())
         new_position_1.save()
 
-        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now(), id=uuid.uuid4())
+        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now())
         new_position_2.save()
 
         self.request = rf.get('/api/position/all', {
@@ -116,7 +116,7 @@ class PositionSelectAllTests(TestCase):
 
         self.assertTrue('"error_id": 301' in response.content.decode('utf-8'))
 
-    def test_no_logged_in_used(self):
+    def test_no_logged_in_user(self):
         mock_request = rf.get('/api/position/select/all')
         response = position_select_all(mock_request)
 
@@ -138,8 +138,7 @@ class PositionSelectIDTests(TestCase):
         new_session.save()
         self.session_id = new_session.id
 
-        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now(),
-                                                 id=uuid.uuid4())
+        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now())
         new_position_1.save()
         self.position_id = new_position_1.id
 
@@ -190,7 +189,7 @@ class PositionSelectIDTests(TestCase):
     def test_position_does_not_exist(self):
         mock_request = rf.get('/api/position/select', {
             'session_id': str(self.session_id),
-            'position_id': '9b378df2-da56-4521-a66c-2110b9baa1a6'
+            'position_id': 111
         })
         response = position_select_id(mock_request)
 
@@ -205,8 +204,7 @@ class PositionSelectIDTests(TestCase):
         new_student = Student.objects.create(user=new_user)
         new_student.save()
 
-        new_position = Position.objects.create(x=1, y=1, student=new_student, timestamp=datetime.now(),
-                                                 id=uuid.uuid4())
+        new_position = Position.objects.create(x=1, y=1, student=new_student, timestamp=datetime.now())
         new_position.save()
 
         mock_request = rf.get('/api/position/select', {
@@ -233,12 +231,10 @@ class PositionSummaryTests(TestCase):
         new_session.save()
         self.session_id = new_session.id
 
-        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now(),
-                                                 id=uuid.uuid4())
+        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now())
         new_position_1.save()
 
-        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now() + timedelta(hours=1),
-                                                 id=uuid.uuid4())
+        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now() + timedelta(hours=1))
         new_position_2.save()
 
         self.request = rf.get('/api/position/summary', {

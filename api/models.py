@@ -7,7 +7,7 @@ import datetime
 
 class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()), editable=False)
     expires = models.DateTimeField(default=timezone.localtime(timezone.now() + datetime.timedelta(hours=24)))
 
@@ -21,7 +21,7 @@ class Student(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reset_password_code = models.CharField(max_length=6, null=True, blank=True)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
         return self.user.last_name + ', ' + self.user.first_name
@@ -75,7 +75,7 @@ class EthnicityLookup(models.Model):
 
 
 class Demographic(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
     age = models.IntegerField()
     gender = models.ForeignKey(GenderLookup, on_delete=models.CASCADE)
@@ -93,7 +93,7 @@ class Demographic(models.Model):
 
 
 class Position(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()))
     x = models.FloatField()
@@ -123,7 +123,7 @@ class Class(models.Model):
         unique_together = ('title', 'semester', 'year')
         ordering = ('title',)
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=50)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     SEMESTERS = (
@@ -163,7 +163,7 @@ class ClassEnrollment(models.Model):
 
 
 class Survey(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     admin = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     associated_class = models.ForeignKey(Class, on_delete=models.DO_NOTHING)
 
@@ -175,7 +175,7 @@ class Survey(models.Model):
 
 
 class SurveyQuestion(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     survey = models.ForeignKey(Survey, on_delete=models.DO_NOTHING)
     TYPES = (
         ('SA', 'Short Answer'),
@@ -193,7 +193,7 @@ class SurveyQuestion(models.Model):
 
 
 class SurveyResponse(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     survey_question = models.ForeignKey(SurveyQuestion, on_delete=models.DO_NOTHING)
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     response = models.TextField()
@@ -206,7 +206,7 @@ class SurveyResponse(models.Model):
 
 
 class Feedback(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     feedback = models.TextField()
 
     def __str__(self):
