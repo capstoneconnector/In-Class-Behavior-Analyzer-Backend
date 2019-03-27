@@ -164,19 +164,19 @@ class ClassEnrollment(models.Model):
 
 class Survey(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    admin = models.ForeignKey(User, on_delete=models.CASCADE)
-    associated_class = models.ForeignKey(Class, on_delete=None)
+    admin = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    associated_class = models.ForeignKey(Class, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return 'Survey - ' + str(self.id)
 
     def to_dict(self):
-        return {'id': str(self.id), 'admin': self.admin.get_full_name(), 'associated_class': str(self.associated_class.id)}
+        return {'id': str(self.id), 'admin': str(self.admin.id), 'associated_class': str(self.associated_class.id)}
 
 
 class SurveyQuestion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    survey = models.ForeignKey(Survey, on_delete=None)
+    survey = models.ForeignKey(Survey, on_delete=models.DO_NOTHING)
     TYPES = (
         ('SA', 'Short Answer'),
         ('LA', 'Essay'),
@@ -194,8 +194,8 @@ class SurveyQuestion(models.Model):
 
 class SurveyResponse(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    survey_question = models.ForeignKey(SurveyQuestion, on_delete=None)
-    student = models.ForeignKey(Student, on_delete=None)
+    survey_question = models.ForeignKey(SurveyQuestion, on_delete=models.DO_NOTHING)
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     response = models.TextField()
 
     def __str__(self):
