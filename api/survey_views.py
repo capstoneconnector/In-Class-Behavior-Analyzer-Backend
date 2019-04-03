@@ -18,7 +18,8 @@ SURVEY_ERRORS = {
     506: 'Class does not exist',
     507: 'Question does not exist',
     508: 'Response already exists',
-    509: 'Student does not have access to survey'
+    509: 'Student does not have access to survey',
+    510: 'Survey Instance already exists'
 }
 
 
@@ -77,6 +78,9 @@ def end_session_create_survey_instance(request):
     current_survey = survey_lookup[0]
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    if len(SurveyInstance.objects.filter(survey=current_survey, student=current_student, date_generated=timezone.now().date())):
+        return JsonResponse(Response.get_error_status(510, SURVEY_ERRORS))
+
     # Create a new SurveyInstance object.
     new_survey_instance = SurveyInstance.objects.create(survey=current_survey, student=current_student)
     new_survey_instance.save()
@@ -127,14 +131,18 @@ def get_all_open_survey_instances(request):
 
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
-    open_survey_query = SurveyInstance.objects.filter(student=current_student, date_generated__gte=timezone.now().date() - datetime.timedelta(weeks=1))
+    open_surveys = set()
+    for survey in SurveyInstance.objects.filter(student=current_student):
+        for question in SurveyQuestionInstance.objects.filter(survey_instance=survey):
+            if len(SurveyResponse.objects.filter(survey_entry_id=question.id)) == 0:
+                open_surveys.add(survey)
 
-    data_object = {}
-    for open_survey in open_survey_query:
-        data_object[open_survey.id] = open_survey.to_dict()
+        for position in SurveyPositionInstance.objects.filter(survey_instance=survey):
+            if len(SurveyResponse.objects.filter(survey_entry_id=position.id)) == 0:
+                open_surveys.add(survey)
 
     success_object = Response.get_success_status()
-    success_object['data'] = data_object
+    success_object['data'] = [x.to_dict() for x in open_surveys]
     return JsonResponse(success_object)
 
 
@@ -200,7 +208,7 @@ def get_survey_by_id(request):
     survey = current_survey.to_dict()
 
     success_object = Response.get_success_status()
-    success_object['data'] = {'survey': survey, 'questions': questions, 'positions': positions}
+    success_object['data'] = {'survey_instance': survey, 'questions': questions, 'positions': positions}
     return JsonResponse(success_object)
 
 
@@ -258,8 +266,20 @@ def add_responses_to_survey(request):
     post_data = request.POST.copy()
     del post_data['survey']
 
-    for entry_id, response in post_data.items():
-        new_response = SurveyResponse.objects.create(survey_entry_id=entry_id, response=response)
-        new_response.save()
+    data_object = {}
 
-    return JsonResponse(Response.get_success_status())
+    for entry_id, response in post_data.items():
+        response_exists = len(SurveyResponse.objects.filter(survey_entry_id=entry_id)) != 0
+        print(response_exists)
+
+        if response_exists:
+            SurveyResponse.objects.get(survey_entry_id=entry_id).response = response
+            data_object[entry_id] = "updated"
+        else:
+            new_response = SurveyResponse.objects.create(survey_entry_id=entry_id, response=response)
+            new_response.save()
+            data_object[entry_id] = "created"
+
+    success_object = Response.get_success_status()
+    success_object['data'] = data_object
+    return JsonResponse(success_object)
