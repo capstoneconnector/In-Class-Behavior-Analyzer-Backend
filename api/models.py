@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import uuid
 from django.utils import timezone
 import datetime
 
@@ -9,7 +8,6 @@ class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True, editable=False)
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
-    expires = models.DateTimeField(default=timezone.localtime(timezone.now() + datetime.timedelta(hours=24)))
 
     def __str__(self):
         return str(self.id) + ' | ' + str(self.timestamp)
@@ -198,13 +196,14 @@ class SurveyQuestion(models.Model):
 class SurveyInstance(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     survey = models.ForeignKey(Survey, on_delete=models.DO_NOTHING)
-    date_generated = models.DateTimeField(default=timezone.now)
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    date_generated = models.DateField(default=timezone.now)
 
     def __str__(self):
         return str(self.id) + " | " + str(self.survey) + " | " + str(self.date_generated)
 
     def to_dict(self):
-        return {'id': self.id, 'survey': self.survey.id, 'date_generate': str(self.date_generated)}
+        return {'id': self.id, 'survey': self.survey.id, 'date_generated': str(self.date_generated)}
 
 
 class SurveyEntryInstance(models.Model):
@@ -241,14 +240,13 @@ class SurveyPositionInstance(SurveyEntryInstance):
 class SurveyResponse(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     survey_entry = models.ForeignKey(SurveyEntryInstance, on_delete=models.DO_NOTHING)
-    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     response = models.TextField()
 
     def __str__(self):
-        return str(self.survey_entry.survey_instance.survey) + " | " + str(self.survey_entry.id) + " | " + str(self.student.id)
+        return str(self.survey_entry.survey_instance.survey) + " | " + str(self.survey_entry.id)
 
     def to_dict(self):
-        return {'id': self.id, 'entry': self.survey_entry.id, 'survey_instance': self.survey_entry.survey_instance.id, 'survey': self.survey_entry.survey_instance.survey.id, 'student': self.student.id, 'response': self.response}
+        return {'id': self.id, 'entry': self.survey_entry.id, 'survey_instance': self.survey_entry.survey_instance.id, 'survey': self.survey_entry.survey_instance.survey.id, 'response': self.response}
 
 
 class Feedback(models.Model):

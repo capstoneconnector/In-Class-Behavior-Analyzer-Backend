@@ -36,8 +36,10 @@ urlpatterns = [
     path('class/movement_summary', class_summarize_movement),
 
     # Survey Requests
-    path('survey/select', survey_get_by_class),
-    path('survey/respond', survey_response_add),
+    path('survey/respond', add_responses_to_survey),
+    path('survey/generate', end_session_create_survey_instance),
+    path('survey/open_surveys', get_all_open_survey_instances),
+    path('survey/get', get_survey_by_id),
 
     # Feedback Requests
     path('feedback/submit', feedback_create)
