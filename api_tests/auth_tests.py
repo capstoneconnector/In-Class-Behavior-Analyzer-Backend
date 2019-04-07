@@ -132,6 +132,7 @@ class UserRegisterTests(TestCase):
         response = register(mock_request)
 
         self.assertTrue('"error_id": 111' in response.content.decode('utf-8'))
+        self.assertTrue(len(User.objects.filter(username='test_user1')) == 0)
 
 
 class UserLogoutTests(TestCase):

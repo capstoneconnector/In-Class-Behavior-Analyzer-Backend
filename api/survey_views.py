@@ -1,4 +1,4 @@
-from .models import Class, Student, Survey, SurveyQuestion, SurveyResponse, SurveyInstance, SurveyQuestionInstance, SurveyPositionInstance, Position
+from .models import Class, Student, Survey, SurveyQuestion, SurveyResponse, SurveyInstance, SurveyQuestionInstance, SurveyPositionInstance, Position, SurveyEntryInstance
 from .response_functions import Response
 from api.auth_views import get_user_logged_in, get_user_by_session
 
@@ -41,7 +41,7 @@ def end_session_create_survey_instance(request):
             class -- The class from which the student was in during the session
 
         Possible Error Codes:
-            500, 501, 503, 504, 506
+            500, 501, 503, 504, 506, 510
 
         Return:
             Type: JSON
@@ -78,7 +78,7 @@ def end_session_create_survey_instance(request):
     current_survey = survey_lookup[0]
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
-    if len(SurveyInstance.objects.filter(survey=current_survey, student=current_student, date_generated=timezone.now().date())):
+    if len(SurveyInstance.objects.filter(survey=current_survey, student=current_student, date_generated=timezone.now().date())) != 0:
         return JsonResponse(Response.get_error_status(510, SURVEY_ERRORS))
 
     # Create a new SurveyInstance object.
@@ -93,6 +93,7 @@ def end_session_create_survey_instance(request):
     start_time_stamp = datetime.datetime.combine(timezone.now(), current_class.start_time)
     end_time_stamp = datetime.datetime.combine(timezone.now(), current_class.end_time)
 
+    # Get all of the positions between the start and end timestamp and create position questions.
     for position in Position.objects.filter(student=current_student, timestamp__lte=end_time_stamp, timestamp__gte=start_time_stamp):
         new_position_instance = SurveyPositionInstance.objects.create(survey_instance=new_survey_instance, position=position)
         new_position_instance.save()
@@ -131,6 +132,7 @@ def get_all_open_survey_instances(request):
 
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    # Get all of the Survey Instance objects with a question or position without response objects.
     open_surveys = set()
     for survey in SurveyInstance.objects.filter(student=current_student):
         for question in SurveyQuestionInstance.objects.filter(survey_instance=survey):
@@ -164,7 +166,7 @@ def get_survey_by_id(request):
             survey_id -- The ID of the SurveyInstance object
 
         Possible Error Codes:
-            500, 501
+            500, 501, 503, 504, 509
 
         Return:
             Type: JSON
@@ -190,15 +192,18 @@ def get_survey_by_id(request):
     current_survey = survey_lookup[0]
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    # Check that the Survey object belongs to the student logged in.
     if current_student != current_survey.student:
         return JsonResponse(Response.get_error_status(509, SURVEY_ERRORS))
 
+    # Get all open question instance objects and append it to the question list
     questions = []
     for question_instance in SurveyQuestionInstance.objects.filter(survey_instance=current_survey):
         question_dict = question_instance.to_dict()
         question_dict['question'] = question_instance.question.to_dict()
         questions.append(question_dict)
 
+    # Get all open position instance objects and append it to the position list
     positions = []
     for position_instance in SurveyPositionInstance.objects.filter(survey_instance=current_survey):
         position_dict = position_instance.to_dict()
@@ -207,6 +212,7 @@ def get_survey_by_id(request):
 
     survey = current_survey.to_dict()
 
+    # Return the survey information
     success_object = Response.get_success_status()
     success_object['data'] = {'survey_instance': survey, 'questions': questions, 'positions': positions}
     return JsonResponse(success_object)
@@ -227,13 +233,13 @@ def add_responses_to_survey(request):
             session_id -- The Session ID of the logged in user
 
         Required POST Parameters:
-            survey -- The Class ID of the associated Class object
+            survey_id -- The Class ID of the associated Survey Instance object
 
         Optional POST Parameters:
             <SURVEYQUESTION_ID> -- The ID of a SurveyQuestion to attach a response to
 
         Possible Error Codes:
-            500, 501, 503, 504
+            500, 501, 503, 504, 509
 
         Return:
             Type: JSON
@@ -248,29 +254,34 @@ def add_responses_to_survey(request):
         return JsonResponse(Response.get_error_status(500, SURVEY_ERRORS))
 
     # Ensure 'survey' in POST parameters.
-    if 'survey' not in request.POST:
+    if 'survey_id' not in request.POST:
         return JsonResponse(Response.get_error_status(503, SURVEY_ERRORS))
 
-    survey_lookup = SurveyInstance.objects.filter(id=request.POST['survey'])
+    survey_lookup = SurveyInstance.objects.filter(id=request.POST['survey_id'])
 
+    # Return an error if the survey instance does not exist
     if len(survey_lookup) == 0:
         return JsonResponse(Response.get_error_status(504, SURVEY_ERRORS))
 
     survey_instance = survey_lookup[0]
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
+    # Return an error if the survey instance
     if current_student != survey_instance.student:
         return JsonResponse(Response.get_error_status(509, SURVEY_ERRORS))
 
     # Make a copy of the POST parameters and remove the 'survey' parameter.
     post_data = request.POST.copy()
-    del post_data['survey']
+    del post_data['survey_id']
 
     data_object = {}
 
     for entry_id, response in post_data.items():
         response_exists = len(SurveyResponse.objects.filter(survey_entry_id=entry_id)) != 0
-        print(response_exists)
+
+        if len(SurveyEntryInstance.objects.filter(id=entry_id)) == 0:
+            data_object[entry_id] = "bad id"
+            continue
 
         if response_exists:
             SurveyResponse.objects.get(survey_entry_id=entry_id).response = response
