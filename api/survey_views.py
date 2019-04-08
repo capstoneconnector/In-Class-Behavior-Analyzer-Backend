@@ -99,7 +99,6 @@ def end_session_create_survey_instance(request):
                                             minute=current_class.end_time.minute)
 
     # Get all of the positions between the start and end timestamp and create position questions.
-    position = Position.objects.get(id=1)
     for position in Position.objects.filter(student=current_student, timestamp__lte=end_time_stamp,
                                             timestamp__gte=start_time_stamp):
         new_position_instance = SurveyPositionInstance.objects.create(survey_instance=new_survey_instance,
