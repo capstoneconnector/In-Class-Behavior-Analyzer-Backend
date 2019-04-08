@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -110,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'EST'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -133,9 +134,15 @@ STATICFILES_DIRS = (
 
 # Email Server Information
 
+
+def get_email_credentials():
+    json_obj = json.load('sendgrid_credentials.json')
+    return (json_obj['user'], json_obj['apikey'])
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = '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'
+EMAIL_HOST_USER = get_email_credentials()[0]
+EMAIL_HOST_PASSWORD = get_email_credentials()[1]

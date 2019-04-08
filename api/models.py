@@ -182,7 +182,6 @@ class SurveyQuestion(models.Model):
         ('SA', 'Short Answer'),
         ('LA', 'Essay'),
         ('RA', 'Range'),
-        ('PA', 'Position')
     )
     type = models.CharField(max_length=2, choices=TYPES, default='SA')
     prompt_text = models.TextField()

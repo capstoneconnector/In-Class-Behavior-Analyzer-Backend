@@ -4,6 +4,7 @@ from api.models import Student, Session, Class, DayLookup, ClassEnrollment, Surv
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 import json
 import datetime
@@ -42,8 +43,8 @@ class EndSessionCreateSurveyInstanceTests(TestCase):
             semester='FL',
             section=1,
             year=2019,
-            start_time=datetime.datetime.now(),
-            end_time=datetime.datetime.now() + datetime.timedelta(hours=1)
+            start_time=timezone.now(),
+            end_time=timezone.now() + datetime.timedelta(hours=1)
         )
         self.new_class.save()
 
@@ -54,7 +55,7 @@ class EndSessionCreateSurveyInstanceTests(TestCase):
 
         self.new_survey_question = SurveyQuestion.objects.create(survey=self.new_survey, type='SA', prompt_text='Test Question')
 
-        self.new_position = Position.objects.create(student=self.new_student, timestamp=datetime.datetime.now() + datetime.timedelta(minutes=10), x=1, y=1)
+        self.new_position = Position.objects.create(student=self.new_student, timestamp=timezone.now() + datetime.timedelta(minutes=10), x=1, y=1)
 
         self.request = rf.post('/api/survey/generate?session_id=' + str(self.session_id), {
             'class': str(self.new_class.id)
@@ -111,8 +112,11 @@ class EndSessionCreateSurveyInstanceTests(TestCase):
         self.assertTrue('"error_id": 504' in response.content.decode('utf-8'))
 
     def test_survey_instance_already_exists(self):
-        SurveyInstance.objects.create(survey=self.new_survey, student=self.new_student)
+        new_survey = SurveyInstance.objects.create(survey=self.new_survey, student=self.new_student, date_generated=timezone.now().date())
+        new_survey.save()
         response = end_session_create_survey_instance(self.request)
+
+        print(response.content.decode('utf-8'))
 
         self.assertTrue('"error_id": 510' in response.content.decode('utf-8'))
 
@@ -148,8 +152,8 @@ class OpenSurveyInstancesTests(TestCase):
             semester='FL',
             section=1,
             year=2019,
-            start_time=datetime.datetime.now(),
-            end_time=datetime.datetime.now() + datetime.timedelta(hours=1)
+            start_time=timezone.now(),
+            end_time=timezone.now() + datetime.timedelta(hours=1)
         )
         self.new_class.save()
 
@@ -180,7 +184,7 @@ class OpenSurveyInstancesTests(TestCase):
         self.assertEqual(1, len(json_obj['data']))
         self.assertEqual(self.new_survey.id, json_obj['data'][0]['survey'])
         self.assertEqual(self.new_survey_instance.id, json_obj['data'][0]['id'])
-        self.assertEqual(datetime.datetime.now().date().strftime('%Y-%m-%d'), json_obj['data'][0]['date_generated'])
+        self.assertEqual(timezone.now().date().strftime('%Y-%m-%d'), json_obj['data'][0]['date_generated'])
 
     def test_correct_closed_surveys(self):
         SurveyResponse.objects.create(survey_entry=self.new_question_instance, response='Test Response')
@@ -235,8 +239,8 @@ class GetSurveyById(TestCase):
             semester='FL',
             section=1,
             year=2019,
-            start_time=datetime.datetime.now(),
-            end_time=datetime.datetime.now() + datetime.timedelta(hours=1)
+            start_time=timezone.now(),
+            end_time=timezone.now() + datetime.timedelta(hours=1)
         )
         self.new_class.save()
 
@@ -343,8 +347,8 @@ class SurveyResponseAddTests(TestCase):
             semester='FL',
             section=1,
             year=2019,
-            start_time=datetime.datetime.now(),
-            end_time=datetime.datetime.now() + datetime.timedelta(hours=1)
+            start_time=timezone.now(),
+            end_time=timezone.now() + datetime.timedelta(hours=1)
         )
         self.new_class.save()
 
