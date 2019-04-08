@@ -136,8 +136,14 @@ STATICFILES_DIRS = (
 
 
 def get_email_credentials():
-    json_obj = json.load('sendgrid_credentials.json')
-    return (json_obj['user'], json_obj['apikey'])
+    try:
+        with open('sendgrid_credentials.json', 'r') as infile:
+            json_obj = json.load(infile)
+        print('\033[92mCredentials for SendGrid API have been retrieved!\033[0m')
+        return (json_obj['user'], json_obj['apikey'])
+    except EnvironmentError:
+        print('\033[93mNo credentials for SendGrid API. No email will be available during this session!\033[0m')
+        return ('', '')
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
