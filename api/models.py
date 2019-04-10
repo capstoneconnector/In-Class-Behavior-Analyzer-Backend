@@ -203,7 +203,7 @@ class SurveyInstance(models.Model):
         return str(self.id) + " | " + str(self.survey) + " | " + str(self.date_generated)
 
     def to_dict(self):
-        return {'id': self.id, 'survey': self.survey.id, 'date_generated': str(self.date_generated)}
+        return {'id': self.id, 'survey': self.survey.id, 'date_generated': str(self.date_generated), 'class': self.survey.associated_class.to_dict()}
 
 
 class SurveyEntryInstance(models.Model):
