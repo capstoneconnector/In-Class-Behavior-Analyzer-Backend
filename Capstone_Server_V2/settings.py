@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'api',
     'workers',
     'django.contrib.admindocs',
-    'django_extensions'
+    'django_extensions',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,158 +1,152 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>ICBA Faculty</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Faculty - Dashboard</title>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js?ver=1.3.2'></script>
+    <link href="https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
-        }
-
-        .top-area {
-            padding-top: 20px;
-            background-color: #ba0c2f;
-            width: 100%;
+        .fa {
             color: white;
         }
 
-        .top-area > h1 {
-            margin: 0;
-            padding-left: 5vw;
+        .far {
+            color: white;
         }
-
-        /* Navbar container */
-        .navbar {
-          overflow: hidden;
-          background-color: #ba0c2f;
-            margin-left: 5vw;
+        
+        .class-table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
         }
-
-        /* Links inside the navbar */
-        .navbar a {
-          float: left;
-          font-size: 16px;
-          color: white;
-          text-align: center;
-          padding: 14px 16px;
-          text-decoration: none;
+        
+        .class-table img {
+            max-height: 100%;
+            height: 20px;
+            width: auto;
         }
-
-        /* The dropdown container */
-        .dropdown {
-          float: left;
-          overflow: hidden;
-        }
-
-        /* Dropdown button */
-        .dropdown .dropbtn {
-          font-size: 16px;
-          border: none;
-          outline: none;
-          color: white;
-          padding: 14px 16px;
-          background-color: inherit;
-          font-family: inherit; /* Important for vertical align on mobile phones */
-          margin: 0; /* Important for vertical align on mobile phones */
-        }
-
-        /* Add a red background color to navbar links on hover */
-        .navbar a:hover, .dropdown:hover .dropbtn {
-          background-color: white;
-            color: #ba0c2f;
-        }
-
-        /* Dropdown content (hidden by default) */
-        .dropdown-content {
-          display: none;
-          position: absolute;
-          background-color: #f9f9f9;
-          min-width: 160px;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          z-index: 1;
-        }
-
-        /* Links inside the dropdown */
-        .dropdown-content a {
-          float: none;
-          color: black;
-          padding: 12px 16px;
-          text-decoration: none;
-          display: block;
-          text-align: left;
-        }
-
-        /* Add a grey background color to dropdown links on hover */
-        .dropdown-content a:hover {
-          background-color: #ddd;
-        }
-
-        /* Show the dropdown menu on hover */
-        .dropdown:hover .dropdown-content {
-          display: block;
-        }
-
-        .content-area {
-            margin-left: 10vw;
-            margin-right: 10vw;
-            margin-top: 5vh;
-        }
-
-        .message-area {
-            position: fixed;
-            width: 24vw;
-            height: 60px;
-            left: 38vw;
-            background-color: rgba(255,255,255,0.8);
-
-        }
-
-        .close-error-button {
-            border: none;
+        
+        a {
+            color: #C41E3A;
+            text-decoration: none;
             background-color: transparent;
-            cursor: pointer;
+        }
+
+        .form-table th {
+            background-color: #C41E3A;
+            color: white;
+        }
+        
+        .form-table select,
+        input {
+            width: 100%;
+        }
+        
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #dataTable td {
+            text-align: center;
+        }
+
+        .form-table th {
+            background-color: #C41E3A;
+            color: white;
+        }
+
+        .form-table select,input {
+            width: 100%;
+        }
+
+        #page-top {
+            background-color: #C41E3A;
         }
 
     </style>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
     <script>
-        let close_error = function() {
-            let message_errors = document.getElementsByClassName("message-area");
-            Array.from(message_errors).forEach((item) => {
-                item.style.visibility = 'hidden';
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
-        }
+          });
+        });
     </script>
+
 </head>
-<body>
-{% if error_message %}
-<div class="message-area">
-    <div style="width:90%;float:left;"><p style="padding-left:10px;">{{ error_message }}</p></div>
-    <button style="width:10%;float:left;height:100%;" onclick="close_error()" class="close-error-button">X</button>
-</div>
-{% endif %}
-    <div class="top-area">
-        <h1>ICBA Faculty</h1>
-        <div class="navbar">
-            <a href="/faculty/">Home</a>
-            <div class="dropdown">
-                <button class="dropbtn">Classes
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a href="/faculty/class/overview">Overview</a>
-                    <a href="/faculty/class/create">Add a Class</a>
-                </div>
+
+<body id="page-top">
+
+    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+        <a class="navbar-brand mr-1" href="{% url 'dashboard' %}">Faculty Dashboard</a>
+
+        <li class="navbar dropdown">
+            <a class="navbar-brand mr-1 dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown">
+                <span>Dropdown <i class="fa fa-caret-down"></i></span>
+            </a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'positions_dashboard' %}">Positions</a>
+                <a class="dropdown-item" href="{% url 'survey_dashboard' %}">Surveys</a>
+                <a class="dropdown-item" href="{% url 'feedback' %}">Feedback</a>
             </div>
-        </div>
-    </div>
+        </li>
 
-    <div class="content-area">
-        {% block content %}
+        <li class="navbar dropdown">
+            <a class="navbar-brand mr-1 dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown">
+                <i class="far fa-user"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'register' %}">Register</a>
+                <a class="dropdown-item" href="{% url 'forgot_password' %}">Forgot Password</a>
+                <a class="dropdown-item" href="{% url 'login' %}">Logout</a>
+            </div>
+        </li>
 
-        {% endblock %}
-    </div>
+    </nav>
+
+    {% block content %}
+
+    {% endblock %}
+
+
 </body>
+
 </html>

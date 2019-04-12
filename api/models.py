@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import uuid
 from django.utils import timezone
 import datetime
 
@@ -17,7 +16,7 @@ class Session(models.Model):
 
 class Student(models.Model):
     class Meta:
-        ordering = ('user__last_name','user__first_name')
+        ordering = ('user__last_name', 'user__first_name')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reset_password_code = models.CharField(max_length=6, null=True, blank=True)
