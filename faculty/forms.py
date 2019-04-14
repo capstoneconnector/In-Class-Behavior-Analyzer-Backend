@@ -1,13 +1,13 @@
 from django.forms import ModelForm
 
-from api.models import Class, Survey, SurveyQuestion, SurveyResponse
+from api.models import Class, Survey, SurveyQuestion, ClassEnrollment, Student
 
 
 class ClassForm(ModelForm):
     class Meta:
         model = Class
         fields = '__all__'
-        exclude = ['admin']
+        exclude = ['id', 'admin']
 
 
 class SurveyForm(ModelForm):
@@ -22,3 +22,18 @@ class SurveyQuestionForm(ModelForm):
         model = SurveyQuestion
         fields = '__all__'
         exclude = ['id']
+
+
+class ClassEnrollmentForm(ModelForm):
+    class Meta:
+        model = ClassEnrollment
+        fields = '__all__'
+        exclude = ['id', 'admin']
+
+
+class StudentForm(ModelForm):
+    class Meta:
+        model = Student
+        fields = '__all__'
+        exclude = ['id', 'admin']
+

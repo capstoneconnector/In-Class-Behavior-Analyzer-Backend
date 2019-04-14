@@ -1,5 +1,284 @@
 {% extends 'faculty/base_templates/dashboard.html' %}
 
-{% block content %}
-    <p>Hi</p>
+    {% block content %}
+        <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+
+                <style>
+                    .collapsible {
+                        background-color: #343a40;
+                        color: white;
+                        cursor: pointer;
+                        padding: 18px;
+                        width: 100%;
+                        border: none;
+                        text-align: left;
+                        outline: none;
+                        font-size: 15px;
+                    }
+                    .collapsible:hover{
+                      background-color: #555;
+                    }
+                    .content {
+                        padding: 20px 20px 20px 20px;
+                        display: none;
+                        overflow: hidden;
+                        background-color: #f1f1f1;
+                    }
+                    .breadcrumb-item {
+                        color: black;
+                    }
+                    .breadcrumb-item{
+                        color: #C41E3A;
+                    }
+                    .form-table th {
+                        background-color: #C41E3A;
+                        color: white;
+                    }
+                    .form-table select,
+                    input {
+                        width: 100%;
+                    }
+                    .submit-button {
+                        background-color: #C41E3A;
+                        color: white;
+                        border: none;
+                        width: auto;
+                        padding: 10px;
+                        cursor: pointer;
+                    }
+                    input[type=text] {
+                      width: 130px;
+                      box-sizing: border-box;
+                      border: 2px solid #ccc;
+                      border-radius: 4px;
+                      font-size: 16px;
+                      background-color: white;
+                      background-position: 10px 10px;
+                      background-repeat: no-repeat;
+                      padding: 10px 10px 10px 10px;
+                      -webkit-transition: width 0.4s ease-in-out;
+                      transition: width 0.4s ease-in-out;
+                        margin-bottom: 20px;
+                        margin-top: 20px;
+                    }
+                    input[type=text]:focus {
+                      width: 100%;
+                    }
+                </style>
+
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item">Overview</li>
+                </ol>
+
+
+                <button class="collapsible"><i class="fas fa-book"></i> Create a class</button>
+                        <div class="content">
+                            <div class="card mb-3">
+                                <div class="addClassDiv col-lg-6">
+
+                                    <br>
+                                    {% if class %}
+                                    <form method="post" action="/faculty/save_form?class={{ class.id }}">
+                                    {% else %}
+                                        <form method="post" action="/faculty/save_form">
+                                    {% endif %}
+                                    {% csrf_token %}
+
+                                            <table class="table table-bordered">
+                                                <tr>
+                                                    <th><label for="id_title">Title:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><input type="text" name="title" maxlength="50" required id="id_title"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_semester">Semester:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><select name="semester" id="id_semester">
+                                                                      <option value="FL">Fall</option>
+
+                                                                      <option value="SP">Spring</option>
+
+                                                                      <option value="SM">Summer</option>
+
+                                                                    </select></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_section">Section:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><input type="number" name="section" required id="id_section"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_year">Year:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><input type="number" name="year" required id="id_year"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_start_time">Start time:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><input type="text" name="start_time" required id="id_start_time"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_end_time">End time:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><input type="text" name="end_time" required id="id_end_time"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><label for="id_days_of_the_week">Days of the week:</label></th>
+                                                    <td>
+                                                        <ul class="errorlist">
+                                                            <li>This field is required.</li>
+                                                        </ul><select name="days_of_the_week" required id="id_days_of_the_week" multiple>
+                                                                      <option value="0">Monday</option>
+
+                                                                      <option value="1">Tuesday</option>
+
+                                                                      <option value="2">Wednesday</option>
+
+                                                                      <option value="3">Thursday</option>
+
+                                                                      <option value="4">Friday</option>
+
+                                                                      <option value="5">Saturday</option>
+
+                                                                      <option value="6">Sunday</option>
+
+                                                                    </select></td>
+                                            </table>
+                                            <br>
+                                            <input type="submit" class="submit-button">
+                                            <br>
+                                            <br>
+                                        </form>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                <button class="collapsible"><i class="fas fa-user-plus"></i> Enroll Students</button>
+                    <div class="content">
+                        <div class="card mb-3">
+
+                            <div class="card-body">
+
+                                {% if class %}
+                                    <form method="post" action="/faculty/save_student_enrollment_form?class={{ class.id }}">
+                                {% else %}
+                                        <form method="post" action="/faculty/save_student_enrollment_form">
+                                {% endif %}
+                                {% csrf_token %}
+                                            <table class="table table-bordered">
+                                                {{ student_form.as_table }}
+                                            </table>
+
+                                    <br>
+                                    <input type="submit" class="submit-button">
+                                    <br>
+
+                                    </form>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                <button class="collapsible"><i class="fas fa-eye"></i> View your classes</button>
+                        <div class="content">
+                            <div class="card mb-3">
+
+                                </i><input id="myInput" type="text" placeholder="Search">
+
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Semester</th>
+                                                <th>Year</th>
+                                                <th>Start Time</th>
+                                                <th>End Time</th>
+                                                <th>Days</th>
+                                                <th>Edit</th>
+                                                <th>Remove</th>
+                                                <th>View Students</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="myTable">
+                                        {% for class in classes %}
+                                            <tr>
+                                                <td>{{ class.title }}</td>
+                                                <td>{{ class.semester }}</td>
+                                                <td>{{ class.year }}</td>
+                                                <td>{{ class.start_time }}</td>
+                                                <td>{{ class.end_time }}</td>
+                                                <td>{% for day in class.days_of_the_week.all %} {{ day.name }} {% endfor %}</td>
+                                                <td><a href="/faculty/{{ class.id }}/edit"><i class="fas fa-pencil-alt"></i></a></td>
+                                                <td><a href="/faculty/{{ class.id }}/remove"><i class="fas fa-trash"></i></a></td>
+                                                <td><a href="/faculty/{{ class.id }}/view_student"><i class="fas fa-eye"></i></a></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Semester</th>
+                                                <th>Year</th>
+                                                <th>Start Time</th>
+                                                <th>End Time</th>
+                                                <th>Days</th>
+                                                <th>Edit</th>
+                                                <th>Remove</th>
+                                                <th>View Students</th>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
+
+                             </div>
+                        </div>
+
+                <script>
+                    var coll = document.getElementsByClassName("collapsible");
+                    var i;
+
+                    for (i = 0; i < coll.length; i++) {
+                        coll[i].addEventListener("click", function() {
+                            this.classList.toggle("active");
+                            var content = this.nextElementSibling;
+                            if (content.style.display === "block") {
+                                content.style.display = "none";
+                            } else {
+                                content.style.display = "block";
+                            }
+                        });
+                    }
+                </script>
+
+            </div>
+
+        </div>
+
+    </div>
+
 {% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'faculty/base_templates/class.html' %}
+
+{% block content %}
+
+    <style>
+        .form-table {
+            border-collapse: collapse;
+        }
+
+        .form-table th {
+            background-color: #ba0c2f;
+            color: white;
+        }
+
+        .form-table select,input {
+            width: 100%;
+        }
+
+        .submit-button {
+            background-color: #ba0c2f;
+            color: white;
+            border: none;
+            width: auto;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+    {% if class %}
+        <form method="post" action="/faculty/save_form?class={{ class.id }}">
+    {% else %}
+        <form method="post" action="/faculty/save_form">
+    {% endif %}
+
+        {% csrf_token %}
+        <table class="form-table">
+            {{ form.as_table }}
+        </table>
+        <input type="submit" class="submit-button">
+    </form>
+
+{% endblock %}
