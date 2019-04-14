@@ -7,17 +7,16 @@ from faculty.forms import ClassForm, SurveyQuestionForm, SurveyForm, ClassEnroll
 @login_required
 def dashboard(request):
     classes = Class.objects.filter(admin=request.user)
-    students = Student.objects.filter()
-    students_enrolled = ClassEnrollment.objects.get_queryset()
-    return render(request, 'faculty/dashboard.html', {'students_enrolled': students_enrolled, 'students': students, 'classes': classes, 'student_form': ClassEnrollmentForm()})
+    students = Class.objects.filter()
+    return render(request, 'faculty/dashboard.html', {'students': students, 'classes': classes, 'student_form': ClassEnrollmentForm()})
+
 
 
 @login_required
 def student_view_table(request, class_id):
     current_class = Class.objects.filter(id=class_id)
-    students = current_class.classenrollment_set.all()
-    students_enrolled = ClassEnrollment.student.get_object(instance=ClassEnrollment.objects.get(class_enrolled=class_id))
-    return render(request, 'faculty/student_view_table.html', {'class': current_class, 'students': students, 'students_enrolled': students_enrolled})
+    students = Class.objects.filter()
+    return render(request, 'faculty/student_view_table.html', {'class': current_class, 'students': students})
 
 
 @login_required
@@ -198,7 +197,6 @@ def question_save_form(request):
 @login_required
 def question_form(request):
     if 'survey' in request.GET:
-
         survey_question_form = SurveyQuestionForm(instance=SurveyQuestion.objects.get(id=request.GET['survey']))
     else:
         survey_question_form = SurveyQuestionForm()
@@ -220,34 +218,30 @@ def add_students_specific_class(request, class_id, first_name, last_name):
 @login_required
 def class_view(request, class_id):
     current_class = Class.objects.get(id=class_id)
-
     students = current_class.classenrollment_set.all()
-
     return_data = {'class': current_class, 'students': students}
+
+    if 'error' in request.GET:
+        return_data['error_message'] = request.GET['error']
 
     return render(request, 'faculty/student_view_table.html', return_data)
 
 
 @login_required
-def questions_view(request, survey_id):
-    question_object = SurveyQuestion.objects.filter(survey_id=survey_id)
-    questions = question_object.all()
-    return_data = {'questions': questions}
-    return render(request, 'faculty/survey_questions.html', return_data)
+def questions_view(request):
+    questions = SurveyQuestion.objects.filter()
+    return render(request, 'faculty/survey_questions.html', {'questions': questions})
 
 
 @login_required
-def responses_view(request, survey_id):
-    responses = SurveyResponse.objects.filter(survey_question=survey_id)
-
-    return_data = {'responses': responses}
-    return render(request, 'faculty/survey_responses.html', return_data)
+def responses_view(request):
+    return render(request, 'faculty/survey_responses.html')
 
 
 @login_required
 def add_survey_question(request, survey_id):
-    survey = Survey.objects.get(survey_id=survey_id)
-    add_question = SurveyQuestion.objects.get(survey_id=survey_id)
+    survey = Survey.objects.get(id=survey_id)
+    add_question = SurveyQuestion.objects.get(id=survey_id)
     survey.associated_class.add(add_question)
     return redirect('/faculty/' + str(survey_id) + '/view_survey')
 
@@ -271,10 +265,3 @@ def student_view_form(request):
     else:
         student_form = ClassEnrollmentForm()
     return render(request, 'faculty/student_enrollment_form.html', {'student_form': student_form})
-
-
-@login_required
-def class_remove_student(request, class_id):
-    remove_student = ClassEnrollment.objects.get(class_enrolled=class_id)
-    remove_student.delete()
-    return redirect('/faculty/' + str(class_id) + '/view_student')
