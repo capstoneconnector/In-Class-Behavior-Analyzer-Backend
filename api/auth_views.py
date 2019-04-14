@@ -214,17 +214,17 @@ def register(request):
     if len(user_lookup) is not 0:
         return JsonResponse(Response.get_error_status(106, AUTH_ERRORS))
 
-    # Create new user
-    new_user = User.objects.create(username=request.POST['username'],
-                                   email=request.POST['email'],
-                                   first_name=request.POST['first_name'],
-                                   last_name=request.POST['last_name'])
-
     # Validate that the password provided is strong enough
     try:
         validate_password(request.POST['password'])
     except ValidationError:
         return JsonResponse(Response.get_error_status(111, AUTH_ERRORS))
+
+    # Create new user
+    new_user = User.objects.create(username=request.POST['username'],
+                                   email=request.POST['email'],
+                                   first_name=request.POST['first_name'],
+                                   last_name=request.POST['last_name'])
 
     new_user.set_password(request.POST['password'])
     new_user.save()

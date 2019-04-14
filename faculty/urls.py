@@ -33,6 +33,10 @@ urlpatterns = [
     path('view_responses', responses_view),
     path('view_questions', questions_view),
     path('<int:survey_id>/add_question', add_survey_question),
+    path('<int:class_id>/remove_student', class_remove_student),
+    path('<int:survey_id>/view_responses', responses_view),
+    path('<int:survey_id>/view_questions', questions_view),
+    path('<int:class_id>/add_question', add_survey_question),
     path('<int:survey_id>/view_survey', survey_view)
 
 ]

@@ -1,0 +1,138 @@
+{% extends 'faculty/base_templates/dashboard.html' %}
+
+    {% block content %}
+    <style>
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+        .breadcrumb-item {
+            color: #C41E3A;
+        }
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #dataTable td {
+            text-align: center;
+        }
+        i {
+            color: #C41E3A;
+            text-decoration: none;
+            background-color: transparent;
+        }
+        .fas {
+            color: black;
+        }
+        input[type=text] {
+            width: 130px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            background-position: 10px 10px;
+            background-repeat: no-repeat;
+            padding: 10px 10px 10px 10px;
+            -webkit-transition: width 0.4s ease-in-out;
+            transition: width 0.4s ease-in-out;
+            margin-bottom: 20px;
+        }
+        input[type=text]:focus {
+            width: 100%;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+    </script>
+
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item">Students</li>
+                </ol>
+
+                <div class="card mb-3">
+                    <div class="card-header"><i class="fas fa-table"></i> Data Table</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+
+                            <input id="myInput" type="text" placeholder="Search">
+
+                                <style>
+                                    .form-table th {
+                                        background-color: #C41E3A;
+                                        color: white;
+                                    }
+                                    .form-table select,input {
+                                        width: 100%;
+                                    }
+                                </style>
+
+                            <script>
+                                let add_student = function() {
+                                    let first_name = document.getElementById("first_name_input").value;
+                                    let last_name = document.getElementById("last_name_input").value;
+                                    if (!first_name) { first_name = "null"; }
+                                    if (!last_name) { last_name="null"; }
+                                    window.location = "/faculty/{{ class.id }}/add_student/" + first_name + "&" + last_name;
+                                }
+                            </script>
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="myTable">
+                                {% for s in students %}
+                                    <tr>
+                                        <td>{{ s.student.user.first_name }}</td>
+                                        <td>{{ s.student.user.last_name }}</td>
+                                        <td><a href="/faculty/{{ class.id }}/remove_student"><i class="fas fa-trash"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><input id="first_name_input" type="text"/></td>
+                                        <td><input id="last_name_input" type="text"/></td>
+                                        <td><button onclick="add_student()"><i class="fas fa-user-plus"></i></button></td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+

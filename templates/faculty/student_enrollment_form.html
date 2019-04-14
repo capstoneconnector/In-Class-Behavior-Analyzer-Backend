@@ -1,0 +1,37 @@
+{% extends 'faculty/base_templates/class.html' %}
+
+{% block content %}
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <div class="card mb-3">
+
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active">Students</li>
+                    </ol>
+
+                    {% if class %}
+                        <form method="post" action="/faculty/save_student_enrollment_form?class={{ class.id }}">
+                    {% else %}
+                        <form method="post" action="/faculty/save_student_enrollment_form">
+                    {% endif %}
+
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            {{ student_form.as_table }}
+                        </table>
+                        <input type="submit" class="submit-button">
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

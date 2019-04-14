@@ -7,8 +7,7 @@ import datetime
 class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True, editable=False)
-    timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()), editable=False)
-    expires = models.DateTimeField(default=timezone.localtime(timezone.now() + datetime.timedelta(hours=24)))
+    timestamp = models.DateTimeField(default=timezone.now, editable=False)
 
     def __str__(self):
         return str(self.id) + ' | ' + str(self.timestamp)
@@ -94,7 +93,7 @@ class Demographic(models.Model):
 class Position(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.localtime(timezone.now()))
+    timestamp = models.DateTimeField(default=timezone.now)
     x = models.FloatField()
     y = models.FloatField()
 
@@ -162,6 +161,9 @@ class ClassEnrollment(models.Model):
 
 
 class Survey(models.Model):
+    class Meta:
+        unique_together = ('admin', 'associated_class')
+
     id = models.AutoField(primary_key=True, editable=False)
     admin = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     associated_class = models.ForeignKey(Class, on_delete=models.DO_NOTHING)
@@ -179,7 +181,7 @@ class SurveyQuestion(models.Model):
     TYPES = (
         ('SA', 'Short Answer'),
         ('LA', 'Essay'),
-        ('RA', 'Range')
+        ('RA', 'Range'),
     )
     type = models.CharField(max_length=2, choices=TYPES, default='SA')
     prompt_text = models.TextField()
@@ -191,17 +193,60 @@ class SurveyQuestion(models.Model):
         return {'id': str(self.id), 'survey': str(self.survey.id), 'type': self.type, 'prompt': self.prompt_text}
 
 
+class SurveyInstance(models.Model):
+    id = models.AutoField(primary_key=True, editable=False)
+    survey = models.ForeignKey(Survey, on_delete=models.DO_NOTHING)
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    date_generated = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return str(self.id) + " | " + str(self.survey) + " | " + str(self.date_generated)
+
+    def to_dict(self):
+        return {'id': self.id, 'survey': self.survey.id, 'date_generated': str(self.date_generated), 'class': self.survey.associated_class.to_dict()}
+
+
+class SurveyEntryInstance(models.Model):
+    id = models.AutoField(primary_key=True, editable=False)
+    survey_instance = models.ForeignKey(SurveyInstance, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return str(self.id) + " | " + str(self.survey_instance.id)
+
+    def to_dict(self):
+        return {'id': self.id, 'survey_instance': self.survey_instance.id}
+
+
+class SurveyQuestionInstance(SurveyEntryInstance):
+    question = models.ForeignKey(SurveyQuestion, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return str(self.id) + " | " + str(self.survey_instance.id) + " | " + str(self.question.id)
+
+    def to_dict(self):
+        return {'id': self.id, 'survey_instance': self.survey_instance.id, 'question': self.question.id}
+
+
+class SurveyPositionInstance(SurveyEntryInstance):
+    position = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return str(self.id) + " | " + str(self.survey_instance.id) + " | " + str(self.position.id)
+
+    def to_dict(self):
+        return {'id': self.id, 'survey_instance': self.survey_instance.id, 'position': self.position.id}
+
+
 class SurveyResponse(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
-    survey_question = models.ForeignKey(SurveyQuestion, on_delete=models.DO_NOTHING)
-    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    survey_entry = models.ForeignKey(SurveyEntryInstance, on_delete=models.DO_NOTHING)
     response = models.TextField()
 
     def __str__(self):
-        return self.survey_question.prompt_text + " | " + str(self.student.id)
+        return str(self.survey_entry.survey_instance.survey) + " | " + str(self.survey_entry.id)
 
     def to_dict(self):
-        return {'id': str(self.id), 'question': str(self.survey_question.id), 'student': str(self.student.id), 'response': self.response}
+        return {'id': self.id, 'entry': self.survey_entry.id, 'survey_instance': self.survey_entry.survey_instance.id, 'survey': self.survey_entry.survey_instance.survey.id, 'response': self.response}
 
 
 class Feedback(models.Model):

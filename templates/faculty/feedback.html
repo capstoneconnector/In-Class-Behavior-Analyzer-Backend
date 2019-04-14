@@ -1,0 +1,119 @@
+{% extends 'faculty/base_templates/dashboard.html' %}
+
+    {% block content %}
+    <style>
+        .table {
+            margin-bottom: 30px;
+        }
+        .table th {
+            background-color: #ba0c2f;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+        .table td {
+            align: center;
+        }
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #dataTable td {
+            text-align: center;
+        }
+        i {
+            color: #C41E3A;
+            text-decoration: none;
+            background-color: transparent;
+        }
+        .breadcrumb-item {
+            color: #C41E3A;
+        }
+        .fa-comments {
+            color: black;
+        }
+        input[type=text] {
+            width: 130px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            background-position: 10px 10px;
+            background-repeat: no-repeat;
+            padding: 10px 10px 10px 10px;
+            -webkit-transition: width 0.4s ease-in-out;
+            transition: width 0.4s ease-in-out;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+        input[type=text]:focus {
+            width: 100%;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+    </script>
+
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item">Feedback</li>
+                </ol>
+
+                <div class="card mb-3">
+
+                    <div class="card-header"><i class="fas fa-comments"></i> Feedback will appear below</div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+
+                            <input id="myInput" type="text" placeholder="Search">
+
+                               <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Feedback</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="myTable">
+                                    {% for x in feed %}
+                                        <tr>
+                                            <td>x.id</td>
+                                            <td>x.feedback</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Feedback</th>
+                                        </tr>
+                                    </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+ {% endblock %}

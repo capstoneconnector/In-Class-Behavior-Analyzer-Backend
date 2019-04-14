@@ -1,0 +1,17 @@
+{% extends 'faculty/base_templates/class.html' %}
+
+{% block content %}
+    <style>
+        .login-form {
+            background-color: gray;
+        }
+    </style>
+
+
+    <form class="login-form" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" class="submit-button">
+    </form>
+
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'faculty/base_templates/dashboard.html' %}
+
+    {% block content %}
+    <style>
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+        .collapsible:hover{
+            background-color: #555;
+        }
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #dataTable td {
+            text-align: center;
+        }
+        i {
+            color: black;
+            text-decoration: none;
+            background-color: transparent;
+        }
+        .breadcrumb-item {
+            color: #C41E3A;
+        }
+        input[type=text] {
+            width: 130px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            background-position: 10px 10px;
+            background-repeat: no-repeat;
+            padding: 10px 10px 10px 10px;
+            -webkit-transition: width 0.4s ease-in-out;
+            transition: width 0.4s ease-in-out;
+            margin-bottom: 20px;
+        }
+        input[type=text]:focus {
+            width: 100%;
+        }
+        .fas {
+            color: white;
+        }
+        .fa-question-circle{
+            color: #C41E3A;
+        }
+        .fa-poll-h{
+            color: #C41E3A;
+        }
+        .submit-button {
+            background-color: #C41E3A;
+            color: white;
+            border: none;
+            width: auto;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .fa-plus-square {
+            color: #C41E3A;
+        }
+    </style>
+
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+                <style>
+                    .collapsible {
+                        background-color: #343a40;
+                        color: white;
+                        cursor: pointer;
+                        padding: 18px;
+                        width: 100%;
+                        border: none;
+                        text-align: left;
+                        outline: none;
+                        font-size: 15px;
+                    }
+                    .content {
+                        padding: 20px 20px 20px 20px;
+                        display: none;
+                        overflow: hidden;
+                        background-color: #f1f1f1;
+                    }
+                </style>
+
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item">Survey</li>
+                </ol>
+
+
+
+
+                <button class="collapsible"><i class="fa fa-edit"></i> Create a survey</button>
+                    <div class="content">
+                        <div class="card mb-3">
+
+                            <div class="card-body">
+
+                                {% if survey %}
+                                    <form method="post" action="/faculty/save_survey_form?class={{ survey.id }}">
+                                {% else %}
+                                        <form method="post" action="/faculty/save_survey_form">
+                                {% endif %}
+                                {% csrf_token %}
+                                            <table class="table table-bordered">
+                                                {{ survey_form.as_table }}
+                                            </table>
+
+                                <br>
+                                <input type="submit" class="submit-button">
+                                <br>
+                                    </form>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                <button class="collapsible"><i class="fa fa-eye"></i> View surveys</button>
+                    <div class="content">
+                        <div class="card mb-3">
+
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+
+                                    <input id="myInput" type="text" placeholder="Search">
+
+                                    <table class="table table-bordered" id="dataTable">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Survey ID</th>
+                                                <th>Associated Class</th>
+                                                <th>Add Question</th>
+                                                <th>View Questions</th>
+                                                <th>View Responses</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="myTable">
+                                        {% for s in surveys %}
+                                            <tr>
+                                                <td>{{ s.id }}</td>
+                                                <td>{{ s.associated_class }}</td>
+                                                <td><a href="/faculty/view_question_form"><i class="fas fa-plus-square"></i></a></td>
+                                                <td><a href="/faculty/{{ s.id }}/view_questions"><i class="fas fa-question-circle"></i></a></td>
+                                                <td><a href="/faculty/{{ s.id }}/view_responses"><i class="fas fa-poll-h"></i></a></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Survey ID</th>
+                                                <th>Associated Class</th>
+                                                <th>Add Question</th>
+                                                <th>View Questions</th>
+                                                <th>View Responses</th>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                        <script>
+                            var coll = document.getElementsByClassName("collapsible");
+                            var i;
+
+                            for (i = 0; i < coll.length; i++) {
+                                coll[i].addEventListener("click", function() {
+                                    this.classList.toggle("active");
+                                    var content = this.nextElementSibling;
+                                    if (content.style.display === "block") {
+                                        content.style.display = "none";
+                                    } else {
+                                        content.style.display = "block";
+                                    }
+                                });
+                            }
+                        </script>
+                </div>
+        </div>
+    </div>
+
+{% endblock %}

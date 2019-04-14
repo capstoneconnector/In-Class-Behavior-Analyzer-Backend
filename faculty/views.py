@@ -11,6 +11,7 @@ def dashboard(request):
     return render(request, 'faculty/dashboard.html', {'students': students, 'classes': classes, 'student_form': ClassEnrollmentForm()})
 
 
+
 @login_required
 def student_view_table(request, class_id):
     current_class = Class.objects.filter(id=class_id)
@@ -264,4 +265,3 @@ def student_view_form(request):
     else:
         student_form = ClassEnrollmentForm()
     return render(request, 'faculty/student_enrollment_form.html', {'student_form': student_form})
-

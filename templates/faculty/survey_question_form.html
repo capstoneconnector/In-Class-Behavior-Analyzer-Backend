@@ -1,0 +1,92 @@
+{% extends 'faculty/base_templates/dashboard.html' %}
+
+{% block content %}
+    <body id="target">
+
+    <style>
+
+        .form-table th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .form-table select,input {
+            width: 100%;
+        }
+
+        .submit-button {
+            background-color: #C41E3A;
+            color: white;
+            border: none;
+            width: auto;
+            padding: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        h5{
+            color: #343a40;
+        }
+        input{
+            width:100px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item active">Survey Question</li>
+            </ol>
+
+            <div class="card mb-3">
+
+                <div class="card-header"><i class="fas fa-comments"></i> Feedback will appear below</div>
+
+                    <div class="card-body">
+
+
+                    <div class="card mb-3">
+
+
+                              {% if class %}
+
+                              <form method="post" action="/faculty/save_question_form?class={{ class.id }}">
+
+                              {% else %}
+
+                              <form method="post" action="/faculty/save_question_form">
+
+                              {% endif %}
+                              {% csrf_token %}
+
+                                    <div id="content">
+
+                                            <table id= "table_content" class="table table-bordered">
+                                                {{ survey_question_form.as_table }}
+                                             </table>
+
+                                    </div>
+
+                                            <input type="submit" class="submit-button">
+                              </form>
+
+
+
+                    </div>
+
+                    </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+{% endblock %}
