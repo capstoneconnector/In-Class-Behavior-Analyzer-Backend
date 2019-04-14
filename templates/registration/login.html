@@ -1,17 +1,51 @@
-{% extends 'registration/base.html' %}
+{% extends 'faculty/base_templates/class.html' %}
 
-{% block content %}
-    <style>
-        .login-form {
-            background-color: gray;
-        }
-    </style>
+    {% block content %}
 
+      <div class="card card-login mx-auto mt-5">
 
-    <form class="login-form" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" class="submit-button">
-    </form>
+        <div class="card-header">Login</div>
+        <div class="card-body">
+
+          <form>
+
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="required" autofocus="autofocus">
+                <label for="inputEmail">Email address</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-row">
+                <div class="col-md-6">
+                  <div class="form-label-group">
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required">
+                    <label for="inputPassword">Password</label>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-label-group">
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" required="required">
+                    <label for="confirmPassword">Confirm password</label>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <a class="btn btn-primary btn-block" href="{% url 'dashboard' %}">Login</a>
+
+          </form>
+
+          <div class="text-center">
+            <a class="d-block small mt-3" href="{% url 'register' %}">Register an Account</a>
+            <a class="d-block small" href="{% url 'forgot_password' %}">Forgot Password?</a>
+          </div>
+        </div>
+
+      </div>
+
 
 {% endblock %}
