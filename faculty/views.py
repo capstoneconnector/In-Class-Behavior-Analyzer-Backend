@@ -9,7 +9,7 @@ def dashboard(request):
     classes = Class.objects.filter(admin=request.user)
     students = Student.objects.filter()
     students_enrolled = ClassEnrollment.objects.get_queryset()
-    return render(request, 'faculty/dashboard.html', {'students_enrolled': students_enrolled, 'students': students, 'classes': classes, 'student_form': ClassEnrollmentForm()})
+    return render(request, 'faculty/dashboard.html', {'students_enrolled': students_enrolled, 'students': students, 'classes': classes, 'class_form': ClassForm(), 'student_form': ClassEnrollmentForm()})
 
 
 @login_required
@@ -93,8 +93,8 @@ def class_overview(request, class_id):
 @login_required
 def class_edit(request, class_id):
     current_class = Class.objects.get(id=class_id)
-    form = ClassForm(instance=current_class)
-    return render(request, 'faculty/dashboard.html', {'form': form, 'class': current_class})
+    class_form = ClassForm(instance=current_class)
+    return render(request, 'faculty/class_edit_form.html', {'class_form': class_form, 'class': current_class})
 
 
 @login_required
