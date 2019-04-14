@@ -91,81 +91,13 @@
                                     {% csrf_token %}
 
                                             <table class="table table-bordered">
-                                                <tr>
-                                                    <th><label for="id_title">Title:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><input type="text" name="title" maxlength="50" required id="id_title"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_semester">Semester:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><select name="semester" id="id_semester">
-                                                                      <option value="FL">Fall</option>
-
-                                                                      <option value="SP">Spring</option>
-
-                                                                      <option value="SM">Summer</option>
-
-                                                                    </select></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_section">Section:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><input type="number" name="section" required id="id_section"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_year">Year:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><input type="number" name="year" required id="id_year"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_start_time">Start time:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><input type="text" name="start_time" required id="id_start_time"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_end_time">End time:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><input type="text" name="end_time" required id="id_end_time"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><label for="id_days_of_the_week">Days of the week:</label></th>
-                                                    <td>
-                                                        <ul class="errorlist">
-                                                            <li>This field is required.</li>
-                                                        </ul><select name="days_of_the_week" required id="id_days_of_the_week" multiple>
-                                                                      <option value="0">Monday</option>
-
-                                                                      <option value="1">Tuesday</option>
-
-                                                                      <option value="2">Wednesday</option>
-
-                                                                      <option value="3">Thursday</option>
-
-                                                                      <option value="4">Friday</option>
-
-                                                                      <option value="5">Saturday</option>
-
-                                                                      <option value="6">Sunday</option>
-
-                                                                    </select></td>
+                                                {{ class_form.as_table }}
                                             </table>
+
                                             <br>
                                             <input type="submit" class="submit-button">
                                             <br>
-                                            <br>
+
                                         </form>
 
                                 </div>
