@@ -1,4 +1,4 @@
-{% extends 'faculty/base_templates/dashboard.html' %}
+{% extends 'faculty/base_templates/class.html' %}
 
     {% block content %}
     <style>
@@ -41,6 +41,12 @@
         }
         input[type=text]:focus {
             width: 100%;
+        }
+        .submit-button{
+            background-color: #C41E3A;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
         }
     </style>
 
@@ -92,6 +98,7 @@
                                     if (!last_name) { last_name="null"; }
                                     window.location = "/faculty/{{ class.id }}/add_student/" + first_name + "&" + last_name;
                                 }
+
                             </script>
 
                             <table class="table table-bordered">
@@ -125,6 +132,8 @@
                         </div>
 
                     </div>
+
+                    <a href="{% url 'dashboard' %}"><button class="submit-button">Back to Dashboard</button></a>
 
                 </div>
 

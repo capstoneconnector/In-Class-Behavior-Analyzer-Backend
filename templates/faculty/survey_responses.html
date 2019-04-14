@@ -1,7 +1,13 @@
-{% extends 'faculty/base_templates/dashboard.html' %}
+{% extends 'faculty/base_templates/class.html' %}
 
     {% block content %}
     <style>
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
         .table tr:nth-child(even) {
             background-color: #f2f2f2;
         }
@@ -33,7 +39,25 @@
         input[type=text]:focus {
             width: 100%;
         }
+        .submit-button{
+            background-color: #C41E3A;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+        }
     </style>
+
+    <script>
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+    </script>
+
 
     <div id="wrapper">
 
@@ -79,6 +103,9 @@
 
                              </table>
                          </div>
+
+                     <a href="{% url 'survey_dashboard' %}"><button class="submit-button">Back to Survey Dashboard</button></a>
+
                      </div>
                  </div>
 
