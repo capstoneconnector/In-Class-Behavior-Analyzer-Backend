@@ -1,0 +1,91 @@
+{% extends 'faculty/base_templates/class.html' %}
+
+{% block content %}
+    <style>
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .table th {
+            background-color: #C41E3A;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .form-table select,
+        input {
+            width: 100%;
+        }
+        .submit-button {
+            background-color: #C41E3A;
+            color: white;
+            border: none;
+            width: auto;
+            padding: 10px;
+            cursor: pointer;
+        }
+        input[type=text] {
+            width: 130px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            background-position: 10px 10px;
+            background-repeat: no-repeat;
+            padding: 10px 10px 10px 10px;
+            -webkit-transition: width 0.4s ease-in-out;
+            transition: width 0.4s ease-in-out;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+        input[type=text]:focus {
+            width: 100%;
+        }
+    </style>
+
+    <div id="wrapper">
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <div class="card mb-3">
+
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active">Class</li>
+                    </ol>
+
+                    {% if class %}
+                        <form method="post" action="/faculty/save_form?class={{ class.id }}">
+                    {% else %}
+                        <form method="post" action="/faculty/save_form">
+                    {% endif %}
+                    {% csrf_token %}
+
+                    <table class="table table-bordered">
+                        {{ class_form.as_table }}
+                    </table>
+
+                    <br>
+                    <input type="submit" class="submit-button">
+                    <br>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
