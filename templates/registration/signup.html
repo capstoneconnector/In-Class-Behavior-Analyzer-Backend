@@ -1,6 +1,6 @@
 {% extends 'faculty/base_templates/class.html' %}
 
-
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
     <style>
@@ -19,13 +19,13 @@
 
     <div class="container">
       <div class="card card-login mx-auto mt-5">
-        <div class="card-header">Login</div>
+        <div class="card-header">Sign Up</div>
         <div class="card-body">
 
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="submit-button">Submit</button>
+                {{ user_create_form.as_p }}
+                <button type="submit" class="submit-button">Sign up</button>
             </form>
 
         </div>
@@ -34,3 +34,6 @@
 
 
 {% endblock %}
+
+
+
