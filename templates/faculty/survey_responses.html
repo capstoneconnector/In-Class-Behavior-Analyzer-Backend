@@ -83,13 +83,15 @@
                                  <thead>
                                      <tr>
                                          <th>Student</th>
+                                         <th>Question</th>
                                          <th>Response</th>
                                      </tr>
                                  </thead>
                                  <tbody id="myTable">
                                      {% for x in responses %}
                                          <tr>
-                                             <td>{{ x.student }}</td>
+                                             <td>{{ x.survey_entry.survey_instance.student }}</td>
+                                             <td>{{ x.prompt }}</td>
                                              <td>{{ x.response }}</td>
                                          </tr>
                                      {% endfor %}
@@ -97,6 +99,7 @@
                                  <tfoot>
                                      <tr>
                                          <th>Student</th>
+                                         <th>Question</th>
                                          <th>Response</th>
                                      </tr>
                                  </tfoot>

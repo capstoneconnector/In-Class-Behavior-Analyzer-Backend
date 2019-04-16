@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from api.models import *
 from faculty.forms import ClassForm, SurveyQuestionForm, SurveyForm, ClassEnrollmentForm
-
+from django.db.utils import IntegrityError
 
 @login_required
 def dashboard(request):
@@ -29,12 +29,12 @@ def positions_dashboard(request):
 @login_required
 def survey_dashboard(request):
     responses = SurveyResponse.objects.filter()
-    surveys = Survey.objects.filter()
+    surveys = Survey.objects.filter(admin=request.user)
     questions = SurveyQuestion.objects.filter()
     if 'survey' in request.GET:
-        survey_form = SurveyForm(instance=Survey.objects.get(id=request.GET['survey']))
+        survey_form = SurveyForm(request.user.id, instance=Survey.objects.get(id=request.GET['survey']))
     else:
-        survey_form = SurveyForm()
+        survey_form = SurveyForm(request.user.id, initial={'admin': request.user})
 
     return render(request, 'faculty/survey_dashboard.html', {'responses': responses, 'questions': questions, 'surveys': surveys, 'survey_form': survey_form, 'survey_question_form': SurveyQuestionForm()})
 
@@ -122,9 +122,9 @@ def student_enrollment_create(request):
 @login_required
 def survey_save_form(request):
     if 'survey' in request.GET:
-        survey_form = SurveyForm(request.POST, instance=Survey.objects.get(id=request.GET['survey']))
+        survey_form = SurveyForm(request.user.id, request.POST, instance=Survey.objects.get(id=request.GET['survey']))
     else:
-        survey_form = SurveyForm(request.POST)
+        survey_form = SurveyForm(request.user.id, request.POST)
 
     if not survey_form.is_valid():
         print(survey_form.errors)
@@ -132,8 +132,11 @@ def survey_save_form(request):
     current_survey = survey_form.save(commit=False)
     current_survey.admin = request.user
 
-    current_survey.save()
-    survey_form.save_m2m()
+    try:
+        current_survey.save()
+        survey_form.save_m2m()
+    except IntegrityError:
+        return redirect('survey_dashboard')
 
     return redirect('survey_dashboard')
 
@@ -234,9 +237,25 @@ def questions_view(request, survey_id):
 
 @login_required
 def responses_view(request, survey_id):
-    responses = SurveyResponse.objects.filter(survey_question=survey_id)
+    survey_instances = SurveyInstance.objects.filter(survey=survey_id)
+    survey_entry_instances = []
+    for survey_instance in survey_instances:
+        survey_entry_instances.extend([x for x in SurveyEntryInstance.objects.filter(survey_instance=survey_instance)])
 
-    return_data = {'responses': responses}
+    responses = []
+    for survey_entry_instance in survey_entry_instances:
+        responses.extend([x for x in SurveyResponse.objects.filter(survey_entry=survey_entry_instance)])
+
+    question_responses = []
+    for response in responses:
+        try:
+            test_survey_entry = SurveyQuestionInstance.objects.get(id=response.survey_entry.id)
+            response.prompt = test_survey_entry.question.prompt_text
+            question_responses.append(response)
+        except SurveyQuestionInstance.DoesNotExist:
+            pass
+
+    return_data = {'responses': question_responses}
     return render(request, 'faculty/survey_responses.html', return_data)
 
 

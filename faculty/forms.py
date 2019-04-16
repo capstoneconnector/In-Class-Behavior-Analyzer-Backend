@@ -16,6 +16,10 @@ class SurveyForm(ModelForm):
         fields = '__all__'
         exclude = ['id', 'admin']
 
+    def __init__(self, admin_id, *args, **kwargs, ):
+        super().__init__(*args, **kwargs)
+        self.fields['associated_class'].queryset = Class.objects.filter(admin_id=admin_id)
+
 
 class SurveyQuestionForm(ModelForm):
     class Meta:
