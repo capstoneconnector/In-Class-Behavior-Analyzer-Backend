@@ -1,32 +1,42 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from api.models import *
 from faculty.forms import ClassForm, SurveyQuestionForm, SurveyForm, ClassEnrollmentForm
 from django.db.utils import IntegrityError
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def dashboard(request):
     classes = Class.objects.filter(admin=request.user)
     students = Student.objects.filter()
     students_enrolled = ClassEnrollment.objects.get_queryset()
-    return render(request, 'faculty/dashboard.html', {'students_enrolled': students_enrolled, 'students': students, 'classes': classes, 'class_form': ClassForm(), 'student_form': ClassEnrollmentForm()})
+    return render(request, 'faculty/dashboard.html',
+                  {'students_enrolled': students_enrolled, 'students': students, 'classes': classes,
+                   'class_form': ClassForm(), 'student_form': ClassEnrollmentForm()})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def student_view_table(request, class_id):
     current_class = Class.objects.filter(id=class_id)
     students = current_class.classenrollment_set.all()
-    students_enrolled = ClassEnrollment.student.get_object(instance=ClassEnrollment.objects.get(class_enrolled=class_id))
-    return render(request, 'faculty/student_view_table.html', {'class': current_class, 'students': students, 'students_enrolled': students_enrolled})
+    students_enrolled = ClassEnrollment.student.get_object(
+        instance=ClassEnrollment.objects.get(class_enrolled=class_id))
+    return render(request, 'faculty/student_view_table.html',
+                  {'class': current_class, 'students': students, 'students_enrolled': students_enrolled})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def positions_dashboard(request):
     positions = Position.objects.filter()
     return render(request, 'faculty/positions_dashboard.html', {'positions': positions})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_dashboard(request):
     responses = SurveyResponse.objects.filter()
     surveys = Survey.objects.filter(admin=request.user)
@@ -36,10 +46,13 @@ def survey_dashboard(request):
     else:
         survey_form = SurveyForm(request.user.id, initial={'admin': request.user})
 
-    return render(request, 'faculty/survey_dashboard.html', {'responses': responses, 'questions': questions, 'surveys': surveys, 'survey_form': survey_form, 'survey_question_form': SurveyQuestionForm()})
+    return render(request, 'faculty/survey_dashboard.html',
+                  {'responses': responses, 'questions': questions, 'surveys': surveys, 'survey_form': survey_form,
+                   'survey_question_form': SurveyQuestionForm()})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_questions(request, survey_id):
     questions = SurveyQuestion.objects.filter()
     survey = Survey.objects.get(id=survey_id)
@@ -52,6 +65,7 @@ def survey_questions(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_responses(request, survey_id):
     responses = SurveyResponse.objects.filter()
     survey = Survey.objects.get(id=survey_id)
@@ -64,22 +78,26 @@ def survey_responses(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def feedback(request):
     feed = Feedback.objects.filter()
     return render(request, 'faculty/feedback.html', {'feed': feed})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def register(request):
     return render(request, 'faculty/register.html')
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def forgot_password(request):
     return render(request, 'faculty/forgot_password.html')
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_overview(request, class_id):
     classes = Class.objects.filter(id=class_id)
     return_data = {'classes': classes}
@@ -91,6 +109,7 @@ def class_overview(request, class_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_edit(request, class_id):
     current_class = Class.objects.get(id=class_id)
     class_form = ClassForm(instance=current_class)
@@ -98,6 +117,7 @@ def class_edit(request, class_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_remove(request, class_id):
     current_class = Class.objects.get(id=class_id)
     current_class.delete()
@@ -105,21 +125,25 @@ def class_remove(request, class_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_create(request):
     return render(request, 'faculty/dashboard.html', {'form': ClassForm()})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_question_create(request):
     return render(request, 'faculty/survey_dashboard.html', {'survey_form': SurveyQuestionForm()})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def student_enrollment_create(request):
     return render(request, 'faculty/dashboard.html', {'student_form': ClassEnrollmentForm()})
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_save_form(request):
     if 'survey' in request.GET:
         survey_form = SurveyForm(request.user.id, request.POST, instance=Survey.objects.get(id=request.GET['survey']))
@@ -142,6 +166,7 @@ def survey_save_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def enrollment_save_form(request):
     if 'class' in request.GET:
         student_form = ClassEnrollmentForm(request.POST, instance=ClassEnrollment.objects.get(id=request.GET['class']))
@@ -161,6 +186,7 @@ def enrollment_save_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_save_form(request):
     if 'class' in request.GET:
         class_form = ClassForm(request.POST, instance=Class.objects.get(id=request.GET['class']))
@@ -180,6 +206,7 @@ def class_save_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def question_save_form(request):
     if 'survey' in request.GET:
         survey_form = SurveyQuestionForm(request.POST, instance=SurveyQuestion.objects.get(id=request.GET['survey']))
@@ -199,6 +226,7 @@ def question_save_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def question_form(request):
     if 'survey' in request.GET:
         survey_question_form = SurveyQuestionForm(instance=SurveyQuestion.objects.get(id=request.GET['survey']))
@@ -208,18 +236,22 @@ def question_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def add_students_specific_class(request, class_id, first_name, last_name):
     try:
         current_class = Class.objects.get(id=class_id)
-        add_student = ClassEnrollment.objects.get(student__user__first_name=first_name, student__user__last_name=last_name)
+        add_student = ClassEnrollment.objects.get(student__user__first_name=first_name,
+                                                  student__user__last_name=last_name)
         current_class.classenrollment_set.add(add_student)
 
         return redirect('/faculty/' + str(class_id) + '/view_student')
     except ClassEnrollment.DoesNotExist:
-        return redirect('/faculty/' + str(class_id) + '/view_student?%s' % 'error=Student does not exist: ' + first_name + ' ' + last_name)
+        return redirect('/faculty/' + str(
+            class_id) + '/view_student?%s' % 'error=Student does not exist: ' + first_name + ' ' + last_name)
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_view(request, class_id):
     current_class = Class.objects.get(id=class_id)
     students = current_class.classenrollment_set.all()
@@ -228,6 +260,7 @@ def class_view(request, class_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def questions_view(request, survey_id):
     question_object = SurveyQuestion.objects.filter(survey_id=survey_id)
     questions = question_object.all()
@@ -236,6 +269,7 @@ def questions_view(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def responses_view(request, survey_id):
     survey_instances = SurveyInstance.objects.filter(survey=survey_id)
     survey_entry_instances = []
@@ -260,6 +294,7 @@ def responses_view(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def add_survey_question(request, survey_id):
     survey = Survey.objects.get(survey_id=survey_id)
     add_question = SurveyQuestion.objects.get(survey_id=survey_id)
@@ -268,6 +303,7 @@ def add_survey_question(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def survey_view(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     survey_for_class = survey.associated_class.objects.all()
@@ -280,6 +316,7 @@ def survey_view(request, survey_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def student_view_form(request):
     if 'student' in request.GET:
         student_form = ClassEnrollmentForm(instance=ClassEnrollment.objects.get(id=request.GET['student']))
@@ -289,6 +326,7 @@ def student_view_form(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/accounts/login')
 def class_remove_student(request, class_id):
     remove_student = ClassEnrollment.objects.get(class_enrolled=class_id)
     remove_student.delete()
