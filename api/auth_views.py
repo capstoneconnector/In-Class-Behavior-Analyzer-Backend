@@ -2,7 +2,6 @@ from .models import Student, Session
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -330,7 +329,7 @@ def request_password_reset(request, username):
     student_account.save()
 
     # Schedule the removal of the reset code after 1 hour
-    expire_reset_code(str(student_account.id), _schedule=timezone.now() + datetime.timedelta(hours=1))
+    expire_reset_code(str(student_account.id), _schedule=datetime.datetime.now() + datetime.timedelta(hours=1))
 
     # Render the email template
     email_html = render_to_string('reset_code_email.html', {'user': {'first_name': user_account.first_name, 'last_name': user_account.last_name}, 'reset_code': reset_code})

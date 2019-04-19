@@ -5,7 +5,6 @@ from api.auth_views import get_user_logged_in, get_user_by_session
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.utils import timezone
 
 import datetime
 
@@ -80,7 +79,7 @@ def end_session_create_survey_instance(request):
     current_student = Student.objects.get(user=get_user_by_session(request.GET['session_id']))
 
     if len(SurveyInstance.objects.filter(survey=current_survey, student=current_student,
-                                         date_generated=timezone.now().date())) != 0:
+                                         date_generated=datetime.datetime.now().date())) != 0:
         return JsonResponse(Response.get_error_status(510, SURVEY_ERRORS))
 
     # Create a new SurveyInstance object.
@@ -93,9 +92,9 @@ def end_session_create_survey_instance(request):
                                                                       question=question)
         new_question_instance.save()
 
-    start_time_stamp = timezone.now().replace(hour=current_class.start_time.hour,
+    start_time_stamp = datetime.datetime.now().replace(hour=current_class.start_time.hour,
                                               minute=current_class.start_time.minute)
-    end_time_stamp = timezone.now().replace(hour=current_class.end_time.hour,
+    end_time_stamp = datetime.datetime.now().replace(hour=current_class.end_time.hour,
                                             minute=current_class.end_time.minute)
 
     # Get all of the positions between the start and end timestamp and create position questions.
