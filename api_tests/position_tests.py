@@ -231,16 +231,16 @@ class PositionSummaryTests(TestCase):
         new_session.save()
         self.session_id = new_session.id
 
-        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now())
+        new_position_1 = Position.objects.create(x=1, y=1, student=self.new_student, timestamp=datetime.now().replace(tzinfo=None))
         new_position_1.save()
 
-        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now() + timedelta(hours=1))
+        new_position_2 = Position.objects.create(x=2, y=2, student=self.new_student, timestamp=datetime.now().replace(tzinfo=None) + timedelta(hours=1))
         new_position_2.save()
 
         self.request = rf.get('/api/position/summary', {
             'session_id': str(self.session_id),
-            'start_time': str(datetime.now() - timedelta(minutes=1)),
-            'end_time': str(datetime.now() + timedelta(hours=2))
+            'start_time': (datetime.now() - timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M:%S"),
+            'end_time': (datetime.now() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
         })
 
     def test_success_status(self):
@@ -257,8 +257,8 @@ class PositionSummaryTests(TestCase):
     def test_retrieve_within_date_range(self):
         request = rf.get('/api/position/summary', {
             'session_id': str(self.session_id),
-            'start_time': str(datetime.now() - timedelta(minutes=1)),
-            'end_time': str(datetime.now() + timedelta(minutes=30))
+            'start_time': (datetime.now() - timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M:%S"),
+            'end_time': (datetime.now() + timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
         })
         response = position_summary(request)
         json_obj = json.loads(response.content.decode('utf-8'))
@@ -268,8 +268,8 @@ class PositionSummaryTests(TestCase):
     def test_wrong_request_type(self):
         request = rf.post('/api/position/summary', {
             'session_id': str(self.session_id),
-            'start_time': str(datetime.now() - timedelta(minutes=1)),
-            'end_time': str(datetime.now() + timedelta(minutes=30))
+            'start_time': (datetime.now() - timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M:%S"),
+            'end_time': (datetime.now() + timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
         })
         response = position_summary(request)
 
@@ -311,4 +311,4 @@ class PositionSummaryTests(TestCase):
         })
         response = position_summary(request)
 
-        self.assertTrue('"error_id": 306' in response.content.decode('utf-8'))
+        self.assertTrue('"error_id": 305' in response.content.decode('utf-8'))

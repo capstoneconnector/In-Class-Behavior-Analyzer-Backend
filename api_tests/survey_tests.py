@@ -116,8 +116,6 @@ class EndSessionCreateSurveyInstanceTests(TestCase):
         new_survey.save()
         response = end_session_create_survey_instance(self.request)
 
-        print(response.content.decode('utf-8'))
-
         self.assertTrue('"error_id": 510' in response.content.decode('utf-8'))
 
 
@@ -387,8 +385,6 @@ class SurveyResponseAddTests(TestCase):
     def test_correct_addition(self):
         response = add_responses_to_survey(self.request)
         json_obj = json.loads(response.content.decode('utf-8'))
-
-        print(json_obj)
 
         self.assertEqual('bad id', json_obj['data']['111'])
         self.assertEqual('created', json_obj['data']['1'])

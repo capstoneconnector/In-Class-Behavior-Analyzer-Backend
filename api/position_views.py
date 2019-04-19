@@ -6,6 +6,7 @@ from api.auth_views import get_user_logged_in, get_user_by_session
 from api.models import *
 
 from api.response_functions import Response
+import datetime
 
 POSITION_ERRORS = {
     300: 'No logged in user',
@@ -56,7 +57,7 @@ def position_create(request):
     try:
         x = request.GET['x']
         y = request.GET['y']
-        time = timezone.localtime(timezone.now())
+        time = datetime.datetime.now()
         new_position = Position.objects.create(student=current_student, x=x, y=y, timestamp=time)
         new_position.save()
 
@@ -207,18 +208,14 @@ def position_summary(request):
 
     # Try to parse the start and end times into DateTime objects. Return error status if the string is invalid.
     try:
-        start_datetime = parse_datetime(request.GET['start_time'])
-        end_datetime = parse_datetime(request.GET['end_time'])
+        start_datetime = datetime.datetime.strptime(request.GET['start_time'], '%Y-%m-%d %H:%M:%S')
+        end_datetime = datetime.datetime.strptime(request.GET['end_time'], '%Y-%m-%d %H:%M:%S')
 
     except ValueError:
         return JsonResponse(Response.get_error_status(305, POSITION_ERRORS))
 
     if start_datetime is None or end_datetime is None:
         return JsonResponse(Response.get_error_status(306, POSITION_ERRORS))
-
-    # Convert start and end times into local time
-    start_datetime = timezone.localtime(timezone.make_aware(start_datetime))
-    end_datetime = timezone.localtime(timezone.make_aware(end_datetime))
 
     # Return a success status with the position summary information.
     success_object = Response.get_success_status()
