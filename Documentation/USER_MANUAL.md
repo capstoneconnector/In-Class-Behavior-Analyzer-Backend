@@ -77,6 +77,11 @@ ALLOWED_HOSTS = ['*']
 ```
 NOTE: *The asterisk symbol can be used to allow any hosts.*
 
+## Admin Page
+The Django Admin page has complete control over the data store in the database and can be used to add new faculty accounts.
+You can navigate to the admin page by running the server in either debug or production and going to through [host:port/admin]().
+The default login for this is **BSU_Admin** with password **ICBA2019!@#$**.
+
 ## SendGrid Email API
 For emails to be sent by the application, we rely on the SendGrid API. You must have a file in the top level of the project folder
 called 'sendgrid_credentials.json' to allow the application to send emails.

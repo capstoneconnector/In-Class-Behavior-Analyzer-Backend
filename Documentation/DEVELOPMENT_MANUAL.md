@@ -52,6 +52,15 @@ cat initializeDatabase.py | python manage.py shell
 
 NOTE: *The default admin login will be **BSU_Admin** with password **ICBA2019!@#$***.
 
+## Reference Documents
+
+### ER Diagram
+The ER diagram shows all of the models and their connections to other models. You can view it [here](https://github.com/KarlMarx4701/In-Class-Behavior-Analyzer-Backend/blob/master/Documentation/ER_Diagram.png).
+
+### Admin Docs
+To view the admin docs, navigate to the admin page and login. At the top right, hit the **Documentation** link. This will
+take you to the admin docs page.
+
 ## Understanding the File Structure
 At the top level the file structure will look like this:
 ```
