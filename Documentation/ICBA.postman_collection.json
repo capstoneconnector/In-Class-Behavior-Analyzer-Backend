@@ -1,0 +1,877 @@
+{
+	"info": {
+		"_postman_id": "59640d9b-0a0e-4e63-97b2-a064acbb25a1",
+		"name": "ICBA",
+		"description": "This is the documentation to outline the API associated with the ICBA project. Any questions can be directed to [Ben Lawson](mailto:bklawson@bsu.edu).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cc28bd9f-b8c1-4d08-a104-d95e9085a394",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "test_user",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/logout?session_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "register_test",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "RegisterTest1234",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "register@test.com",
+									"type": "text"
+								},
+								{
+									"key": "first_name",
+									"value": "Register",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Password Reset",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/request_password_reset/<USERNAME HERE>",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"request_password_reset",
+								"<USERNAME HERE>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "new_password",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/reset_password/<RESET CODE HERE>",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"reset_password",
+								"<RESET CODE HERE>"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Demographic",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "age",
+									"value": "18",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "grade_year",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "ethnicity",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "race",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "major",
+									"value": "Communications",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/demographic/create?session_id",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"demographic",
+								"create"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Request to create a demographic object."
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "gender",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "grade_year",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "ethnicity",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "race",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "major",
+									"value": "Test Major 2",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "19",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/demographic/update?session_id",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"demographic",
+								"update"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Request to update an already created demographic."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/demographic/delete?session_id",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"demographic",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Request to delete a demographic."
+					},
+					"response": []
+				},
+				{
+					"name": "Select",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/demographic/select?session_id",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"demographic",
+								"select"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Request to get the current"
+					},
+					"response": []
+				},
+				{
+					"name": "Form",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/demographic/form",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"demographic",
+								"form"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Position",
+			"item": [
+				{
+					"name": "Add Position",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/position/create?session_id=3&x=5&y=5",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"position",
+								"create"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "3"
+								},
+								{
+									"key": "x",
+									"value": "5"
+								},
+								{
+									"key": "y",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Select All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/position/select/all?session_id",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"position",
+								"select",
+								"all"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Select By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/position/select?id=4f3da89a-3d8d-4907-b069-161ab30d621c&session_id=",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"position",
+								"select"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "4f3da89a-3d8d-4907-b069-161ab30d621c"
+								},
+								{
+									"key": "session_id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/position/summary?session_id=a115c66e-52b9-4245-a9f7-4c2ebf9b42c3&start=2019-02-23 14:00:00&end=2019-02-23 15:00:00",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"position",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "a115c66e-52b9-4245-a9f7-4c2ebf9b42c3"
+								},
+								{
+									"key": "start",
+									"value": "2019-02-23 14:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2019-02-23 15:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Class",
+			"item": [
+				{
+					"name": "Select All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/class/select/all?session_id=e15b3dfc-2285-479b-af91-5766ac6585df",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"class",
+								"select",
+								"all"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "e15b3dfc-2285-479b-af91-5766ac6585df"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Class Movement Summary",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "start_date",
+									"value": "03/26/2019",
+									"type": "text"
+								},
+								{
+									"key": "end_date",
+									"value": "03/28/2019",
+									"type": "text"
+								},
+								{
+									"key": "class",
+									"value": "25c36e5a-27c6-47bf-8e78-4ffb129b30bc",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/class/movement_summary?session_id=e15b3dfc-2285-479b-af91-5766ac6585df",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"class",
+								"movement_summary"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "e15b3dfc-2285-479b-af91-5766ac6585df"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Survey",
+			"item": [
+				{
+					"name": "End Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "class",
+									"value": "4",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/survey/generate?session_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"survey",
+								"generate"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Open Surveys",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/api/survey/open_surveys?session_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"survey",
+								"open_surveys"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Survey Data By ID",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "survey_id",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/survey/get?session_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"survey",
+								"get"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Respond To Survey",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "survey",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "1",
+									"value": "The powerpoint presentation from the other students.",
+									"type": "text"
+								},
+								{
+									"key": "2",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "3",
+									"value": "I sat here because it was close to an outlet.",
+									"type": "text"
+								},
+								{
+									"key": "4",
+									"value": "I moved here because I wanted to be in a group with my friends.",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/survey/respond?session_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"survey",
+								"respond"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Class",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "class",
+									"value": "25c36e5a-27c6-47bf-8e78-4ffb129b30bc",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/survey/select?session_id=e15b3dfc-2285-479b-af91-5766ac6585df",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"survey",
+								"select"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "e15b3dfc-2285-479b-af91-5766ac6585df"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Survey Add Responses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "507b244d-5aef-4b5f-aaf4-40c60c6cf975",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "96ab9e39-82fa-46e0-94cc-8efb8d41a09a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
